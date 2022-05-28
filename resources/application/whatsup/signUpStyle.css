@@ -1,0 +1,16 @@
+#background{
+    -fx-background-color: #1A2F4B;
+}
+
+#button{
+    -fx-background-color: #84C69B;
+}
+
+#textField{
+    -fx-background-color: transparent;
+    -fx-border-color: #84C69B;
+    -fx-border-width: 0 0 1 0;
+    -fx-text-fill: white;
+    -fx-font-size: 16 px;
+    -fx-font-family: ikonli;
+}

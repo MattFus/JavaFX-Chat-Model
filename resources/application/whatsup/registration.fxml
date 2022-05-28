@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<BorderPane id="background" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="250.0" stylesheets="@signUpStyle.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.whatsup.controllers.RegistrationController">
+   <top>
+      <BorderPane prefHeight="170.0" prefWidth="330.0" BorderPane.alignment="CENTER">
+         <center>
+            <FontIcon iconColor="#84c69b" iconLiteral="mdi-account-multiple" iconSize="150" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
+   </top>
+   <center>
+      <GridPane BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="66.0" minHeight="10.0" prefHeight="44.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="92.0" minHeight="0.0" prefHeight="38.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="180.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="180.0" minHeight="10.0" prefHeight="26.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="180.0" minHeight="10.0" prefHeight="130.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <TextField id="textField" fx:id="usernameField" maxWidth="180.0" promptText="Username" stylesheets="@signUpStyle.css" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <font>
+                  <Font name="Ikonli" size="12.0" />
+               </font></TextField>
+            <PasswordField id="textField" fx:id="passwordField" maxWidth="180.0" promptText="Password" stylesheets="@signUpStyle.css" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+            <TextField id="textField" fx:id="emailField" maxWidth="180.0" promptText="Email" stylesheets="@signUpStyle.css" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+            <HBox alignment="CENTER" prefHeight="90.0" prefWidth="250.0" spacing="50.0" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+               <children>
+                  <Button id="button" fx:id="cancelButton" maxHeight="40.0" maxWidth="79.0" minHeight="40.0" minWidth="70.0" mnemonicParsing="false" onAction="#onClickCancel" prefHeight="40.0" prefWidth="79.0" stylesheets="@signUpStyle.css" text="Cancel" textFill="WHITE">
+                     <font>
+                        <Font name="Ikonli" size="18.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor></Button>
+                  <Button id="button" fx:id="confirmButton" maxHeight="40.0" maxWidth="92.0" minHeight="40.0" minWidth="70.0" mnemonicParsing="false" onAction="#onClickConfirm" prefHeight="40.0" prefWidth="92.0" stylesheets="@signUpStyle.css" text="Confirm" textFill="WHITE">
+                     <font>
+                        <Font name="Ikonli" size="18.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor></Button>
+               </children>
+            </HBox>
+            <Label fx:id="resultLabel" alignment="CENTER" prefHeight="17.0" prefWidth="246.0" textFill="WHITE" GridPane.rowIndex="3">
+               <font>
+                  <Font name="Ikonli" size="15.0" />
+               </font></Label>
+         </children>
+      </GridPane>
+   </center>
+</BorderPane>

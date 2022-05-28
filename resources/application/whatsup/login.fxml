@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<BorderPane id="background" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="250.0" style="-fx-background-color: #1A2F4B;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.whatsup.controllers.LoginController">
+   <center>
+      <GridPane prefHeight="270.0" prefWidth="330.0" BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="59.0" minHeight="10.0" prefHeight="54.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="92.0" minHeight="10.0" prefHeight="57.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="181.0" minHeight="10.0" prefHeight="181.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <TextField id="textField" fx:id="usernameField" maxWidth="180.0" promptText="Username" style="-fx-background-color: transparent; -fx-border-color: #84C69B; -fx-border-width: 0 0 1 0;" stylesheets="@signUpStyle.css" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <font>
+                  <Font name="Ikonli" size="12.0" />
+               </font></TextField>
+            <PasswordField id="textField" fx:id="passwordField" maxWidth="180.0" promptText="Password" style="-fx-background-color: transparent; -fx-border-color: #84C69B; -fx-border-width: 0 0 1 0;" stylesheets="@signUpStyle.css" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+               <font>
+                  <Font name="Ikonli" size="12.0" />
+               </font></PasswordField>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+               <children>
+                  <Label fx:id="resultLabel" alignment="CENTER" prefHeight="17.0" prefWidth="209.0" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font name="Ikonli" size="15.0" />
+                     </font></Label>
+                  <Button id="button" fx:id="loginButton" defaultButton="true" maxHeight="40.0" maxWidth="70.0" mnemonicParsing="false" onAction="#onClickLogin" prefHeight="40.0" prefWidth="70.0" style="-fx-background-color: #84C69B;" text="Login" textFill="WHITE">
+                     <font>
+                        <Font name="Ikonli" size="18.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor></Button>
+                  <Button id="button" fx:id="registerButton" maxHeight="42.0" maxWidth="98.0" mnemonicParsing="false" onAction="#onClickRegister" prefHeight="42.0" prefWidth="98.0" style="-fx-background-color: #84C69B;" text="Register" textFill="WHITE">
+                     <font>
+                        <Font name="Ikonli" size="18.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor></Button>
+                  <Hyperlink alignment="CENTER" contentDisplay="CENTER" prefHeight="15.0" prefWidth="108.0" text="Reset Password" textAlignment="CENTER">
+                     <font>
+                        <Font name="Ikonli" size="12.0" />
+                     </font></Hyperlink>
+               </children>
+            </VBox>
+         </children>
+      </GridPane>
+   </center>
+   <top>
+      <BorderPane prefHeight="170.0" prefWidth="330.0" BorderPane.alignment="CENTER">
+         <center>
+            <FontIcon iconColor="#84c69b" iconLiteral="mdi-account-multiple" iconSize="150" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
+   </top>
+</BorderPane>

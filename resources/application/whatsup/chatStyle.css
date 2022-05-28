@@ -1,0 +1,36 @@
+.split-pane > .split-pane-divider{
+    -fx-padding: 0 0.1px 0 0.1px;
+}
+.scroll-bar:horizontal, .scroll-bar:vertical{
+    -fx-background-color:transparent;
+    -fx-padding: 0 0.1px 0 0.1px;
+}
+
+#searchField{
+    -fx-background-color: transparent;
+    -fx-border-color: #84C69B;
+    -fx-border-width: 0 0 1 0;
+    -fx-text-fill: white;
+    -fx-font-size: 16 px;
+    -fx-font-family: ikonli;
+}
+
+.MessageLabel{
+    -fx-background-radius: 20 20 20 20;
+    -fx-background-color: #423F3E;
+    -fx-font-size: 16px;
+    -fx-font-fill: white;
+}
+
+.scroll-pane{
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport{
+    -fx-background-color: transparent;
+}
+
+.stack-pane{
+    -fx-margin-right: 10px;
+    -fx-margin-left: 10px;
+}
