@@ -21,7 +21,8 @@ public class AudioLabel extends Label implements Runnable{
     private FontIcon playIcon;
     private byte[] out;
     private AudioInputStream audioInputStream;
-    SourceDataLine sourceDataLine;
+    private SourceDataLine sourceDataLine;
+    private boolean started;
 
     public AudioLabel(byte[] out) {
         this.out = out;
@@ -32,7 +33,9 @@ public class AudioLabel extends Label implements Runnable{
         playIcon.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                threadStart();
+                if(!started)
+                    threadStart();
+                else stop();
             }
         });
         //setEventHandler(playIcon);
@@ -57,8 +60,13 @@ public class AudioLabel extends Label implements Runnable{
         return format;
     }
 
+    private void stop(){
+        Thread.currentThread().interrupt();
+    }
+
     @Override
     public void run() {
+        started = true;
         try {
             byte audioData[] = out;
             // Get an input stream on the byte array

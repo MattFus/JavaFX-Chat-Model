@@ -1,14 +1,20 @@
 package application.whatsup;
 
 import application.whatsup.Client.Client;
+import application.whatsup.controllers.CallController;
 import application.whatsup.controllers.ChatController;
+import application.whatsup.controllers.EmojiController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Dialog;
 import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,6 +70,13 @@ public class SceneHandler {
         stage.show();
     }
 
+    public void showCallWindow() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("callFrame.fxml"));
+        Parent root = (AnchorPane) fxmlLoader.load();
+        Dialog<String> d = new Dialog<>();
+        d.showAndWait();
+    }
+
     public void showError(String error){
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(error);
@@ -82,5 +95,18 @@ public class SceneHandler {
             return tmp;
         }
         return null;
+    }
+
+    public void openEmojiTable(String username, String toUser) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("emojiTable.fxml"));
+        Parent root = (BorderPane) fxmlLoader.load();
+        EmojiController controller = (EmojiController) fxmlLoader.getController();
+        controller.setUsername(username);
+        controller.setToUser(toUser);
+        Stage tmp = new Stage();
+        tmp.setScene(new Scene(root));
+        tmp.setResizable(false);
+        tmp.initStyle(StageStyle.UTILITY);
+        tmp.show();
     }
 }

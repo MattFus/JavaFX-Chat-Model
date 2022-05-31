@@ -1,7 +1,9 @@
 package application.whatsup.Client;
 
 import application.whatsup.Common.Protocol;
+import application.whatsup.SceneHandler;
 import javafx.util.Pair;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -45,7 +47,7 @@ public class Client implements Runnable{
         return username;
     }
 
-    public Vector<String> getMessages(String user){
+    public Vector<Pair<String, String>> getMessages(String user){
         for(Contact c : contacts){
             if(c.getUsername().equalsIgnoreCase(user))
                 return c.getUserMessages();
@@ -60,6 +62,15 @@ public class Client implements Runnable{
         }
         return null;
     }
+
+    public Vector<Pair<String, String>> getEmojiMessages(String user){
+        for(Contact c : contacts){
+            if(c.getUsername().equalsIgnoreCase(user))
+                return c.getUserEmoji();
+        }
+        return null;
+    }
+
     public void addMessage(String fromUser, String toUser, String text) {
         for(Contact c : contacts){
             if(c.getUsername().equalsIgnoreCase(toUser))
@@ -71,6 +82,13 @@ public class Client implements Runnable{
         for(Contact c : contacts){
             if(c.getUsername().equalsIgnoreCase(toUser))
                 c.addAudioMessage(fromUser, message);
+        }
+    }
+
+    public void addEmojiMessage(String fromUser, String toUser, String iconCode){
+        for(Contact c : contacts){
+            if(c.getUsername().equalsIgnoreCase(toUser))
+                c.addEmojiMessage(fromUser, iconCode);
         }
     }
 
@@ -108,19 +126,6 @@ public class Client implements Runnable{
                     System.out.println("CLIENT INSERISCE I CONTATTI");
                     contactsModified = true;
                 }
-                /*//TODO: Sometimes server doesn't seem to send "USERHANDLER"
-                else if(res instanceof ArrayList<?>){
-                    System.out.println("CLIENT RICEVE I CONTATTI COME ARRAYLIST");
-                    ArrayList<String> contactsList = (ArrayList<String>) res;
-                    for(String u : contactsList){
-                        Contact user = new Contact(u);
-                        //Messages messages = new Messages();
-                        contacts.add(user);
-                    }
-                    System.out.println("CLIENT INSERISCE I CONTATTI");
-                    contactsModified = true;
-                }
-                 */
                 else if(res instanceof String && ((String) res).equalsIgnoreCase(Protocol.MESSAGE)){
                     String fromUser =(String) in.readObject();
                     String mex = (String) in.readObject();
@@ -139,6 +144,26 @@ public class Client implements Runnable{
                         if(c.getUsername().equalsIgnoreCase(fromUser))
                             c.addAudioMessage(fromUser, audio);
                     }
+                }
+                else if(res instanceof String && ((String) res).equalsIgnoreCase(Protocol.EMOJI)){
+                    String fromUser = (String) in.readObject();
+                    String ikon = (String) in.readObject();
+                    System.out.println("Ho ricevuto una emoji");
+                    for(Contact c : contacts){
+                        if(c.getUsername().equalsIgnoreCase(fromUser))
+                            c.addEmojiMessage(fromUser, ikon);
+                    }
+                }
+                else if(res instanceof String && ((String) res).equalsIgnoreCase(Protocol.CALL)){
+                    String fromUser = (String) in.readObject();
+                    String mex = (String) in.readObject();
+                    sendMessageTo(Protocol.ACCEPT_CALL, username, fromUser, Protocol.ACCEPT_CALL);
+                    SceneHandler.getInstance().showCallWindow();
+                }
+                else if(res instanceof String && ((String) res).equalsIgnoreCase(Protocol.ACCEPT_CALL)){
+                    String fromUser = (String) in.readObject();
+                    String mex = (String) in.readObject();
+                    SceneHandler.getInstance().showCallWindow();
                 }
                 else{
                     System.out.println("SERVER WROTE -> " + res + System.lineSeparator());
@@ -207,6 +232,9 @@ public class Client implements Runnable{
         if(out == null)
             return false;
         try {
+            if(mex instanceof FontIcon){
+                System.out.println("INVIO EMOJI");
+            }
             out.writeObject(protocol);
             out.writeObject(fromUser);
             out.writeObject(toUser);

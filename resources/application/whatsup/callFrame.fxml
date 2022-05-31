@@ -6,19 +6,18 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-
 <AnchorPane prefHeight="181.0" prefWidth="310.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.whatsup.controllers.CallController">
    <children>
       <BorderPane layoutX="55.0" layoutY="-9.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <center>
             <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="134.0" prefWidth="144.0" BorderPane.alignment="CENTER">
                <graphic>
-                  <FontIcon iconLiteral="mdi-account" iconSize="145" />
+                  <FontIcon iconColor="#2890a8" iconLiteral="mdi-account" iconSize="145" />
                </graphic>
             </Label>
          </center>
          <bottom>
-            <Button mnemonicParsing="false" text="Close" BorderPane.alignment="CENTER" />
+            <Button fx:id="closeButton" mnemonicParsing="false" onAction="#onClickCloseCall" text="Close" BorderPane.alignment="CENTER" />
          </bottom>
       </BorderPane>
    </children>

@@ -113,7 +113,7 @@
                                     <Cursor fx:constant="HAND" />
                                  </cursor>
                               </Label>
-                              <Button fx:id="callButton" mnemonicParsing="false" style="-fx-background-color: #84C69B; -fx-background-radius: 20 20 20 20;" GridPane.columnIndex="2" GridPane.halignment="RIGHT">
+                              <Button fx:id="callButton" mnemonicParsing="false" onAction="#onClickCall" style="-fx-background-color: #84C69B; -fx-background-radius: 20 20 20 20;" GridPane.columnIndex="2" GridPane.halignment="RIGHT">
                                  <graphic>
                                     <FontIcon iconColor="WHITE" iconLiteral="mdi-phone" iconSize="30" />
                                  </graphic>
@@ -137,7 +137,7 @@
                      <bottom>
                         <HBox id="userAreaChat" alignment="CENTER" prefHeight="57.0" prefWidth="792.0" spacing="15.0" style="-fx-background-color: #28475C; -fx-background-radius: 20 20 20 20; -fx-border-width: 10 10 10 10; -fx-border-color: #28475C; -fx-border-radius: 5 5 5 5;" BorderPane.alignment="CENTER">
                            <children>
-                              <Button id="button" fx:id="emoButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="45.0" style="-fx-background-color: #84C69B; -fx-background-radius: 15 15 15;" textFill="WHITE">
+                              <Button id="button" fx:id="emoButton" mnemonicParsing="false" onAction="#onClickShowEmoticons" prefHeight="40.0" prefWidth="45.0" style="-fx-background-color: #84C69B; -fx-background-radius: 15 15 15;" textFill="WHITE">
                                  <graphic>
                                     <FontIcon iconColor="WHITE" iconLiteral="mdi-emoticon" iconSize="30" />
                                  </graphic>

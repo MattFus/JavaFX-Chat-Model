@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="217.0" prefWidth="274.0" style="-fx-background-color: #1A2F4B;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.whatsup.controllers.EmojiController">
+   <center>
+      <GridPane style="-fx-background-color: #1A2F4B;" BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <FontIcon fx:id="hwfSmilingFace" iconColor="WHITE" iconLiteral="hwf-smiling-face" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon fx:id="hwfKissingFace" iconColor="WHITE" iconLiteral="hwf-kissing-face" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon fx:id="hwfLaughingFace3" iconColor="WHITE" iconLiteral="hwf-laughing-face3" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon fx:id="hwfGrinningFace2" iconColor="WHITE" iconLiteral="hwf-grinning-face2" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon fx:id="hwfAstonishedFace" iconColor="WHITE" iconLiteral="hwf-astonished-face" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon fx:id="hwfFaceClosedEyesOpenMouth" iconColor="WHITE" iconLiteral="hwf-face-closed-eyes-open-mouth" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon fx:id="hwfFlashedFace2" iconColor="WHITE" iconLiteral="hwf-flashed-face2" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon fx:id="hwfFaceStuckOutTongue2" iconColor="WHITE" iconLiteral="hwf-face-stuck-out-tongue2" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon fx:id="hwfSmirkingFace" iconColor="WHITE" iconLiteral="hwf-smirking-face" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon fx:id="hwfWinkingFace2" iconColor="WHITE" iconLiteral="hwf-winking-face2" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon fx:id="hwfWorriedFaceRyebrows" iconColor="WHITE" iconLiteral="hwf-worried-face-eyebrows" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon fx:id="hwfUnamusedFaceTightlyClosedEyes" iconColor="WHITE" iconLiteral="hwf-unamused-face-tightly-closed-eyes" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon fx:id="hwfAngryFace" iconColor="WHITE" iconLiteral="hwf-angry-face" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon fx:id="hwfAngryFaceOpenMouthEyebrows" iconColor="WHITE" iconLiteral="hwf-angry-face-open-mouth-eyebrows" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon iconColor="WHITE" iconLiteral="hwf-grinning-face-teeth2" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon iconColor="WHITE" iconLiteral="hwf-rock-n-roll" iconSize="50" onMouseClicked="#onClickSendEmoji" text="" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon iconColor="WHITE" iconLiteral="hwf-high-five" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon iconColor="WHITE" iconLiteral="hwf-middle-finger" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon iconColor="WHITE" iconLiteral="hwf-thumb-up" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <FontIcon iconColor="WHITE" iconLiteral="hwf-thumb-down" iconSize="50" onMouseClicked="#onClickSendEmoji" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+         </children>
+      </GridPane>
+   </center>
+   <effect>
+      <DropShadow />
+   </effect>
+</BorderPane>

@@ -2,6 +2,7 @@ package application.whatsup.Server;
 
 import application.whatsup.Common.Protocol;
 import application.whatsup.Common.User;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
