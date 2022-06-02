@@ -6,6 +6,7 @@
 <li> <code>JavaFX </code>
 <li> <code>Maven </code>
   
-  ```This is an University Project so maybe there are some bugs that I'll fix```
-  
+  ***This is an University Project so maybe there are some bugs that I'll fix***  
+  <h2> FEATURES </h2>
+
   
