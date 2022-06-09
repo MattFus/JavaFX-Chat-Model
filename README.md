@@ -8,8 +8,9 @@
   
   ***This is an University Project so maybe there are some bugs that I'll fix***  
   <h2> FEATURES </h2>
-    <li> - [x] Automatic chat UI
+    <li> - [x] Chat UI Style
     <li> - [x] Emoticons
     <li> - [x] Voice messages
-    <li> - [ ] Voice call
+    <li> - [x] Images
+    <li> - [x] Files 80%
   
