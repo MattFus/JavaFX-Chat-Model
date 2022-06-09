@@ -34,3 +34,26 @@
     -fx-margin-right: 10px;
     -fx-margin-left: 10px;
 }
+
+.button:pressed:hover {
+    -fx-scale-y: 0.9;
+    -fx-scale-x: 0.9;
+}
+
+.menu-item:focused{
+    -fx-background-color: transparent;
+}
+
+.context-menu {
+    -fx-background-color:  #84C69B;
+    -fx-background-radius: 15 15 15 15;
+}
+
+.button:hover {
+    -fx-background-color: #383838;
+    -fx-scale-y: 1.1;
+}
+
+.textArea{
+    -fx-background-color: transparent;
+}
