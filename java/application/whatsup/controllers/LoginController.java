@@ -6,10 +6,7 @@ import application.whatsup.SceneHandler;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -22,6 +19,9 @@ public class LoginController implements Initializable {
 
     @FXML
     private PasswordField passwordField;
+
+    @FXML
+    private Hyperlink resetHyperLink;
 
     @FXML
     private Label resultLabel;
@@ -42,6 +42,7 @@ public class LoginController implements Initializable {
         else{
             System.out.println("NIENTE LOGIN");
             Client.getInstance().reset();
+            resultLabel.setWrapText(true);
             resultLabel.setText(res);
         }
         usernameField.setText("");
@@ -53,8 +54,17 @@ public class LoginController implements Initializable {
         SceneHandler.getInstance().setRegistrationWindow();
     }
 
+    @FXML
+    void onClickResetPassword(ActionEvent event) {
+        if (!usernameField.getText().isEmpty()){
+            String res = Client.getInstance().reset(usernameField.getText(), Protocol.RESETPASSWORD);
+            resultLabel.setText(res);
+        }
+        else resultLabel.setText("Please insert your username");
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        resultLabel.setWrapText(true);
     }
 }

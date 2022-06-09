@@ -32,7 +32,7 @@ public class DataBase {
     public synchronized boolean insertUser(User user) throws SQLException {
         if( con == null || con.isClosed() || user == null)
             return false;
-        if(existsUser(user))    //CONTROLLO SE ESISTE GIà
+        if(existsUser(user.getUsername()))    //CONTROLLO SE ESISTE GIà
             return false;
         PreparedStatement statement = con.prepareStatement("INSERT INTO Users VALUES(?,?,?);");
         statement.setString(1,user.getUsername());
@@ -43,13 +43,13 @@ public class DataBase {
         return true;
     }
 
-    public synchronized boolean existsUser(User user) throws SQLException {
-        if(con == null || con.isClosed() || user == null)
+    public synchronized boolean existsUser(String username) throws SQLException {
+        if(con == null || con.isClosed() || username == null)
             return false;
 
         String query = "SELECT * FROM Users WHERE username=?;";
         PreparedStatement p = con.prepareStatement(query);
-        p.setString(1, user.getUsername());
+        p.setString(1, username);
         ResultSet rs = p.executeQuery();
         boolean result = rs.next();
         p.close();
@@ -71,4 +71,20 @@ public class DataBase {
         return check;
     }
 
+    public String changePsw(String username, String generatedPassword) throws SQLException {
+        if(con == null || con.isClosed() || username == null)
+            return null;
+        String email = "";
+        PreparedStatement statement = con.prepareStatement("SELECT * FROM Users WHERE username=?;");
+        statement.setString(1, username);
+        ResultSet result = statement.executeQuery();
+        if(result.next()){
+            email = result.getString("email");
+            PreparedStatement statement1 = con.prepareStatement("UPDATE Users SET password=? WHERE username=?");
+            statement1.setString(1, BCrypt.hashpw(generatedPassword, BCrypt.gensalt(10)));
+            statement1.setString(2, username);
+            statement1.executeUpdate();
+        }
+        return email;
+    }
 }

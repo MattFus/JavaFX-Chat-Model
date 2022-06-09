@@ -3,6 +3,7 @@ package application.whatsup.controllers;
 import application.whatsup.Client.Client;
 import application.whatsup.Client.Contact;
 import application.whatsup.Common.AudioLabel;
+import application.whatsup.Common.FileLabel;
 import application.whatsup.Common.Protocol;
 import application.whatsup.SceneHandler;
 import javafx.animation.AnimationTimer;
@@ -12,9 +13,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -23,25 +24,22 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextFlow;
-import javafx.stage.Stage;
 import javafx.util.Pair;
 import org.kordamp.ikonli.javafx.FontIcon;
+import org.apache.commons.io.FilenameUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ResourceBundle;
 import java.util.Vector;
-
-import javax.sound.sampled.LineUnavailableException;
 
 public class ChatController extends AnimationTimer implements Initializable {
     //utilities
     private Vector<Contact> contacts;
     private static String username;
     private Image userImg;
+    private Vector<Pane> contactLabels;
 
 
     //Chat----------------------------------------------------------
@@ -68,6 +66,9 @@ public class ChatController extends AnimationTimer implements Initializable {
 
     @FXML
     private Button micButton;
+
+    @FXML
+    private MenuButton includeButton;
 
     @FXML
     private Circle recDotIndicator;
@@ -112,19 +113,25 @@ public class ChatController extends AnimationTimer implements Initializable {
     @Override
     public void handle(long now) {
         if (Client.getInstance().getContactsModified()) {
-            Vector<Contact> tmp = Client.getInstance().getUsers();
-            contacts.clear();
-            for(Contact c : tmp){
-                contacts.add(c);
-            }
+            contacts = Client.getInstance().getUsers();
             contactsVBox.getChildren().clear();
+            contactLabels = new Vector<Pane>();
             for(Contact c : contacts){
-                if(!c.getUsername().equalsIgnoreCase(username)){
-                    contactsVBox.getChildren().add(addContact(c.getUsername()));
-                    contactsVBox.getChildren().add(new Separator());
+                if(!c.getUsername().equalsIgnoreCase(username)) {
+                    contactLabels.add(addContact(c.getUsername()));
                 }
             }
-
+        }
+        //TODO: SEARCHFIELD
+        for(Pane p : contactLabels){
+            if(!p.getId().contains(searchField.getText())){
+                contactsVBox.getChildren().remove(p);
+            }
+            else {
+                if(!contactsVBox.getChildren().contains(p)){
+                    contactsVBox.getChildren().add(p);
+                }
+            }
         }
         if(now - previousTime >= frequency){
             if(!contact_nameField.getText().isEmpty()) {
@@ -133,69 +140,84 @@ public class ChatController extends AnimationTimer implements Initializable {
                 Vector<Pair<String, String>> messages = Client.getInstance().getMessages(userChat); //<-- HERE
                 Vector<Pair<String, byte[]>> audioMessages = Client.getInstance().getAudioMessages(userChat); //<-- HERE
                 Vector<Pair<String, String>> emojiMessages = Client.getInstance().getEmojiMessages(userChat); //<-- HERE
+                Vector<Pair<String, byte[]>> fileMessages = Client.getInstance().getFileMessages(userChat);
+                Vector<Pair<String, byte[]>> imageMessages = Client.getInstance().getImageMessages(userChat);
                 //TODO: MESSAGES
                 if(!messages.isEmpty() && allMessages != null){
-                    Pair<String, String> parsed = messages.get(0);
-                    System.out.println(parsed.getKey() + " " + parsed.getValue() + System.lineSeparator());
-                    if(parsed.getKey().equalsIgnoreCase(username)){
-                        //MY MESSAGE
-                        StackPane flow = messagesMaker(parsed.getValue(), true);
-                        flow.setAlignment(Pos.CENTER_RIGHT);
-                        flow.setPadding(new Insets(10));
-                        allMessages.getChildren().add(flow);
-                    }
-                    else if(parsed.getKey().equalsIgnoreCase(userChat)){
-                        //RECEIVED FROM ANOTHER USER
-                        StackPane flow = messagesMaker(parsed.getValue(), false);
-                        flow.setPadding(new Insets(10));
-                        flow.setAlignment(Pos.CENTER_LEFT);
-                        allMessages.getChildren().add(flow);
+                    for(Pair<String,String> parsed : messages) {
+                        if (parsed.getKey().equalsIgnoreCase(username)) {
+                            //MY MESSAGE
+                            StackPane flow = messagesMaker(parsed.getValue(), true);
+                            allMessages.getChildren().add(flow);
+                        } else if (parsed.getKey().equalsIgnoreCase(userChat)) {
+                            //RECEIVED FROM ANOTHER USER
+                            StackPane flow = messagesMaker(parsed.getValue(), false);
+                            allMessages.getChildren().add(flow);
+                        }
                     }
                 }
                 //TODO: AUDIO MESSAGES
                 if(!audioMessages.isEmpty() && allMessages != null){
-                    Pair<String, byte[]> parsed = audioMessages.get(0);
-                    if(parsed.getKey().equalsIgnoreCase(username)){
-                        //MY AUDIO MESSAGE
-                        StackPane flow = audioMessageMaker(parsed, true);
-                        flow.setAlignment(Pos.CENTER_RIGHT);
-                        flow.setPadding(new Insets(10));
-                        allMessages.getChildren().add(flow);
-                    }
-                    else if(parsed.getKey().equalsIgnoreCase(userChat)){
-                        //RECEIVED FROM ANOTHER USER
-                        StackPane flow = audioMessageMaker(parsed, false);
-                        flow.setAlignment(Pos.CENTER_LEFT);
-                        flow.setPadding(new Insets(10));
-                        allMessages.getChildren().add(flow);
+                    for(Pair<String, byte[]> parsed : audioMessages) {
+                        if (parsed.getKey().equalsIgnoreCase(username)) {
+                            //MY AUDIO MESSAGE
+                            StackPane flow = audioMessageMaker(parsed, true);
+                            allMessages.getChildren().add(flow);
+                        } else if (parsed.getKey().equalsIgnoreCase(userChat)) {
+                            //RECEIVED FROM ANOTHER USER
+                            StackPane flow = audioMessageMaker(parsed, false);
+                            allMessages.getChildren().add(flow);
+                        }
                     }
                 }
                 //TODO: EMOTICON MESSAGES
                 if(!emojiMessages.isEmpty() && allMessages != null){
-                    Pair<String, String> parsed = emojiMessages.get(0);
-                    if(parsed.getKey().equalsIgnoreCase(username)){
-                        StackPane flow = emojiMessagesMaker(parsed, true);
-                        flow.setAlignment(Pos.CENTER_RIGHT);
-                        flow.setPadding(new Insets(10));
-                        allMessages.getChildren().add(flow);
+                    for(Pair<String, String> parsed : emojiMessages) {
+                        if (parsed.getKey().equalsIgnoreCase(username)) {
+                            StackPane flow = emojiMessagesMaker(parsed, true);
+                            allMessages.getChildren().add(flow);
+                        } else if (parsed.getKey().equalsIgnoreCase(userChat)) {
+                            StackPane flow = emojiMessagesMaker(parsed, false);
+                            allMessages.getChildren().add(flow);
+                        }
                     }
-                    else if(parsed.getKey().equalsIgnoreCase(userChat)){
-                        StackPane flow = emojiMessagesMaker(parsed, false);
-                        flow.setAlignment(Pos.CENTER_LEFT);
-                        flow.setPadding(new Insets(10));
-                        allMessages.getChildren().add(flow);
+                }
+                //TODO: FILE MESSAGES
+                if(!fileMessages.isEmpty() && allMessages != null){
+                    for(Pair<String, byte[]> parsed : fileMessages){
+                        if(parsed.getKey().equalsIgnoreCase(username)){
+                            StackPane flow = fileMessagesMaker(parsed, true);
+                            allMessages.getChildren().add(flow);
+                        } else if(parsed.getKey().equalsIgnoreCase(userChat)){
+                            StackPane flow = fileMessagesMaker(parsed, false);
+                            allMessages.getChildren().add(flow);
+                        }
+                    }
+                }
+                //TODO: IMAGE MESSAGE
+                if(!imageMessages.isEmpty() && allMessages != null){
+                    for(Pair<String, byte[]> parsed : imageMessages){
+                        System.out.println(parsed.getKey() + System.lineSeparator());
+                        if(parsed.getKey().equalsIgnoreCase(username)){
+                            StackPane flow = imageMessagesMaker(parsed, true);
+                            allMessages.getChildren().add(flow);
+                        } else if(parsed.getKey().equalsIgnoreCase(userChat)){
+                            StackPane flow = imageMessagesMaker(parsed, false);
+                            allMessages.getChildren().add(flow);
+                        }
                     }
                 }
             }
             previousTime = now;
         }
     }
-                //TODO: SEND MESSAGE BUTTON
+
+
+    //TODO: SEND MESSAGE BUTTON
     @FXML
     void onClickSendMessage(ActionEvent event) {
         if(!contact_nameField.getText().isEmpty() && !messageArea.getText().isEmpty()){
             String toUser = contact_nameField.getText();
-            System.out.println("Invio messaggio a " + toUser + System.lineSeparator());
             Client.getInstance().addMessage(username, toUser, messageArea.getText());
             Client.getInstance().sendMessageTo(Protocol.MESSAGE,username,toUser, messageArea.getText());
             messageArea.setText("");
@@ -217,9 +239,6 @@ public class ChatController extends AnimationTimer implements Initializable {
                     recDotIndicator.setVisible(false);
                     micButton.setDisable(false);
                     out = AudioController.getInstance().getData();
-                    //StackPane audioPane = audioMessageMaker(out);
-                    //audioPane.setAlignment(Pos.CENTER_RIGHT);
-                    //allMessages.getChildren().add(audioPane);
                     String toUser = contact_nameField.getText();
                     Client.getInstance().addAudioMessage(username, toUser, out);
                     Client.getInstance().sendMessageTo(Protocol.AUDIO_MESSAGE, username, toUser, out);
@@ -230,10 +249,33 @@ public class ChatController extends AnimationTimer implements Initializable {
 
                 //TODO: CALL BUTTON
     @FXML
-    void onClickCall(ActionEvent event) {
-        if(!contact_nameField.getText().isEmpty()){
-            String toUser = contact_nameField.getText();
-            Client.getInstance().sendMessageTo(Protocol.CALL, username, toUser, Protocol.CALL);
+    void onClickCall(ActionEvent event) throws IOException {
+
+    }
+                //TODO: SEND FILE BUTTON
+    @FXML
+    void onClickSendFile(ActionEvent event) throws IOException {
+        File file = SceneHandler.getInstance().showFilePicker();
+        if(file != null && !contact_nameField.getText().isEmpty() && !file.getName().contains("\\/.:")) { //to avoid path traversal
+            FileInputStream in = new FileInputStream(file.getAbsolutePath());
+            byte[] fileData = new byte[(int)file.length()];
+            in.read(fileData);
+            Client.getInstance().addFileMessage(username, contact_nameField.getText(), fileData);
+            String fileExt = FilenameUtils.getExtension(file.getName());
+            Client.getInstance().sendMessageTo(Protocol.FILE, username, contact_nameField.getText(), fileData);
+        }
+    }
+                //TODO: SEND IMAGE BUTTON
+    @FXML
+    void onClickSendImage(ActionEvent event) throws IOException {
+        File file = SceneHandler.getInstance().showImagePicker();
+        if(file != null && !contact_nameField.getText().isEmpty()){
+            FileInputStream in = new FileInputStream(file.getAbsolutePath());
+            byte[] imageData = new byte[(int)file.length()];
+            in.read(imageData);
+            Client.getInstance().addImageMessage(username, contact_nameField.getText(), imageData);
+            Client.getInstance().sendMessageTo(Protocol.IMAGE, username, contact_nameField.getText(), imageData);
+            System.out.println("Invio immagine a "+ contact_nameField.getText() + System.lineSeparator());
         }
     }
 
@@ -277,10 +319,10 @@ public class ChatController extends AnimationTimer implements Initializable {
         userAccountImage.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                Image img = SceneHandler.getInstance().showImagePicker();
-                if(img != null){
+                File file = SceneHandler.getInstance().showImagePicker();
+                if(file != null){
                     //TODO: Need to insert and retrieve image from database
-                    userAccountImage.setFill(new ImagePattern(img));
+                    userAccountImage.setFill(new ImagePattern(new Image(file.toURI().toString())));
                 }
             }
         });
@@ -292,12 +334,12 @@ public class ChatController extends AnimationTimer implements Initializable {
                     onClickSendMessage(new ActionEvent());
             }
         });
-        //FOR TESTING PURPOSE
 
+        //FOR TESTING PURPOSE
 
     }
 
-    private Node addContact(String user) {
+    private Pane addContact(String user) {
         BorderPane pane = new BorderPane();
         pane.setPrefSize(150,30);
         pane.setId(user);
@@ -311,35 +353,36 @@ public class ChatController extends AnimationTimer implements Initializable {
 
         pane.setLeft(icon);
         pane.setCenter(label);
-        pane.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                contact_call_videoCallGridPane.setVisible(true);
-                allMessagesScrollArea.setVisible(true);
-                if(!contact_nameField.getText().equalsIgnoreCase(user)) //if contact changes, chat will reset
-                    allMessages.getChildren().clear();
-                contact_nameField.setText(user);
-            }
+        pane.setBottom(new Separator());
+        pane.setOnMouseClicked(event -> {
+            contact_call_videoCallGridPane.setVisible(true);
+            allMessagesScrollArea.setVisible(true);
+            if(!contact_nameField.getText().equalsIgnoreCase(user)) //if contact changes, chat will reset
+                allMessages.getChildren().clear();
+            contact_nameField.setText(user);
+            EmojiController.getInstance().setToUser(user);
         });
+        pane.setId(user);
         return pane;
     }
 
     private StackPane messagesMaker(String parsed, boolean user) {
         StackPane stack = new StackPane();
-        System.out.println(Character.toChars(0x1F621));
-        //byte[] emojiByteCode = new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0x81};
-        //String emoji = new String(emojiByteCode, StandardCharsets.UTF_8);
-        //TextFlow flow = new TextFlow();
         Label label = new Label();
         label.setWrapText(true);
         label.setText(parsed);
         label.setTextFill(Color.WHITE);
         label.setPadding(new Insets(5));
         label.setMinHeight(30);
-        if(user)
+        if(user) {
             label.setStyle("-fx-background-radius: 20 20 20 20;-fx-background-color: #84C69B; -fx-font-size: 20px; -fx-font-fill: white;");
-        else
+            stack.setAlignment(Pos.CENTER_RIGHT);
+        }
+        else {
             label.setStyle("-fx-background-radius: 20 20 20 20;-fx-background-color: #423F3E; -fx-font-size: 20px; -fx-font-fill: white;");
+            stack.setAlignment(Pos.CENTER_LEFT);
+        }
+        stack.setPadding(new Insets(5));
         stack.getChildren().add(label);
         return stack;
     }
@@ -350,10 +393,15 @@ public class ChatController extends AnimationTimer implements Initializable {
         AudioLabel label = new AudioLabel(parsed.getValue());
         label.setPadding(new Insets(5));
         label.setMinHeight(30);
-        if(user)
+        if(user) {
             label.setStyle("-fx-background-radius: 20 20 20 20;-fx-background-color: #84C69B; -fx-font-size: 20px; -fx-font-fill: white;");
-        else
+            stack.setAlignment(Pos.CENTER_RIGHT);
+        }
+        else {
             label.setStyle("-fx-background-radius: 20 20 20 20;-fx-background-color: #423F3E; -fx-font-size: 20px; -fx-font-fill: white;");
+            stack.setAlignment(Pos.CENTER_LEFT);
+        }
+        stack.setPadding(new Insets(5));
         stack.getChildren().add(label);
         return stack;
     }
@@ -363,16 +411,57 @@ public class ChatController extends AnimationTimer implements Initializable {
         Label label = new Label();
         label.setPadding(new Insets(5));
         label.setMinHeight(35);
-        if(user)
+        if(user) {
             label.setStyle("-fx-background-radius: 20 20 20 20;-fx-background-color: #84C69B; -fx-font-size: 20px; -fx-font-fill: white;");
-        else
+            stack.setAlignment(Pos.CENTER_RIGHT);
+        }
+        else {
             label.setStyle("-fx-background-radius: 20 20 20 20;-fx-background-color: #423F3E; -fx-font-size: 20px; -fx-font-fill: white;");
+            stack.setAlignment(Pos.CENTER_LEFT);
+        }
         FontIcon icon = new FontIcon(parsed.getValue());
         icon.setIconColor(Color.WHITE);
         icon.setIconSize(35);
         label.setGraphic(icon);
+        stack.setPadding(new Insets(5));
         stack.getChildren().add(label);
         return stack;
     }
 
+    private StackPane fileMessagesMaker(Pair<String, byte[]> parsed, boolean user){
+        StackPane stack = new StackPane();
+        FileLabel label = new FileLabel(parsed.getValue());
+        label.setPadding(new Insets(5));
+        label.setMinHeight(30);
+        if(user) {
+            label.setStyle("-fx-background-radius: 20 20 20 20;-fx-background-color: #84C69B; -fx-font-size: 20px; -fx-font-fill: white;");
+            stack.setAlignment(Pos.CENTER_RIGHT);
+        }
+        else {
+            label.setStyle("-fx-background-radius: 20 20 20 20;-fx-background-color: #423F3E; -fx-font-size: 20px; -fx-font-fill: white;");
+            stack.setAlignment(Pos.CENTER_LEFT);
+        }
+        stack.setPadding(new Insets(5));
+        stack.getChildren().add(label);
+        return stack;
+    }
+
+    private StackPane imageMessagesMaker(Pair<String, byte[]> parsed, boolean user){
+        StackPane stack = new StackPane();
+        Label label = new Label();
+        if(user) {
+            label.setStyle("-fx-background-radius: 20 20 20 20;-fx-background-color: #84C69B; -fx-font-size: 20px; -fx-font-fill: white;");
+            stack.setAlignment(Pos.CENTER_RIGHT);
+        }
+        else {
+            label.setStyle("-fx-background-radius: 20 20 20 20;-fx-background-color: #423F3E; -fx-font-size: 20px; -fx-font-fill: white;");
+            stack.setAlignment(Pos.CENTER_LEFT);
+        }
+        Image image = new Image(new ByteArrayInputStream(parsed.getValue()), 350,350,false,false);
+        ImageView img = new ImageView(image);
+        label.setGraphic(new ImageView(image));
+        label.setPadding(new Insets(15));
+        stack.getChildren().add(label);
+        return stack;
+    }
 }

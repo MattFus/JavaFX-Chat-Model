@@ -7,8 +7,18 @@ import javafx.scene.input.MouseEvent;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 public class EmojiController {
-    private String username;
-    private String toUser;
+    private static String username;
+    private static String toUser;
+    private static EmojiController instance = null;
+
+    public EmojiController(){
+    }
+
+    public static EmojiController getInstance() {
+        if(instance == null)
+            instance = new EmojiController();
+        return instance;
+    }
 
     @FXML
     void onClickSendEmoji(MouseEvent event) {
@@ -17,6 +27,7 @@ public class EmojiController {
     }
 
     public void sendEmoji(String iconCode){
+        username = Client.getInstance().getUsername();
         Client.getInstance().addEmojiMessage(username, toUser, iconCode);
         Client.getInstance().sendMessageTo(Protocol.EMOJI,username,toUser, iconCode);
     }

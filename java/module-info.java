@@ -12,6 +12,8 @@ module application.whatsup {
     requires spring.security.crypto;
     requires java.sql;
     requires java.desktop;
+    requires org.apache.commons.io;
+    requires javax.mail.api;
 
     opens application.whatsup to javafx.fxml;
     exports application.whatsup;

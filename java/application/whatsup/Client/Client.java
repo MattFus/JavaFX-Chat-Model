@@ -2,6 +2,7 @@ package application.whatsup.Client;
 
 import application.whatsup.Common.Protocol;
 import application.whatsup.SceneHandler;
+import application.whatsup.controllers.AudioController;
 import javafx.util.Pair;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -28,7 +29,6 @@ public class Client implements Runnable{
             socket = new Socket("localhost",8000);
             out = new ObjectOutputStream(socket.getOutputStream());
             Thread t = new Thread(this);
-            //contacts = new HashMap<Contact, Messages>();
             contacts = new Vector<Contact>();
             contactsModified = false;
             t.start();
@@ -71,6 +71,22 @@ public class Client implements Runnable{
         return null;
     }
 
+    public Vector<Pair<String, byte[]>> getFileMessages(String user){
+        for(Contact c : contacts){
+            if(c.getUsername().equalsIgnoreCase(user))
+                return c.getUserFileMessages();
+        }
+        return null;
+    }
+
+    public Vector<Pair<String, byte[]>> getImageMessages(String user){
+        for(Contact c : contacts){
+            if(c.getUsername().equalsIgnoreCase(user))
+                return c.getUserImageMessages();
+        }
+        return null;
+    }
+
     public void addMessage(String fromUser, String toUser, String text) {
         for(Contact c : contacts){
             if(c.getUsername().equalsIgnoreCase(toUser))
@@ -92,6 +108,20 @@ public class Client implements Runnable{
         }
     }
 
+    public void addFileMessage(String fromUser, String toUser, byte[] fileData){
+        for(Contact c : contacts){
+            if(c.getUsername().equalsIgnoreCase(toUser))
+                c.addFileMessage(fromUser, fileData);
+        }
+    }
+
+    public void addImageMessage(String fromUser, String toUser, byte[] fileData){
+        for(Contact c : contacts){
+            if(c.getUsername().equalsIgnoreCase(toUser))
+                c.addImageMessage(fromUser, fileData);
+        }
+    }
+
     public Vector<Contact> getUsers(){
         contactsModified = false;
         return contacts;
@@ -109,28 +139,17 @@ public class Client implements Runnable{
                 //TODO:If I receive "USERHANDLER" then i have to update contacts
                 if(((String) res).equalsIgnoreCase(Protocol.USERHANDLER)){
                     String str = (String) res;
-                    System.out.println("CLIENT RICEVE USERHANDLER");
                     ArrayList<String> contactsList = (ArrayList<String>) in.readObject();
-                    System.out.println(contactsList);
                     contacts.clear();
                     for(String u : contactsList){
                         Contact user = new Contact(u);
-                        boolean inserisci = true;
-                        for(Contact c : contacts){
-                            if(c.getUsername().equalsIgnoreCase(u))
-                                inserisci = false;
-                        }
                         contacts.add(user);
-                        System.out.println("Aggiungo " + user.getUsername());
                     }
-                    System.out.println("CLIENT INSERISCE I CONTATTI");
                     contactsModified = true;
                 }
                 else if(res instanceof String && ((String) res).equalsIgnoreCase(Protocol.MESSAGE)){
                     String fromUser =(String) in.readObject();
                     String mex = (String) in.readObject();
-                    System.out.println("Ho ricevuto " + res + " FROM " + fromUser + " : " + mex + System.lineSeparator());
-                    //Messages.addMessage(fromUser + ":" + mex);
                     for(Contact c : contacts){
                         if(c.getUsername().equalsIgnoreCase(fromUser))
                             c.addMessage(fromUser, mex);
@@ -139,7 +158,6 @@ public class Client implements Runnable{
                 else if(res instanceof String && ((String) res).equalsIgnoreCase(Protocol.AUDIO_MESSAGE)){
                     String fromUser = (String) in.readObject();
                     byte[] audio = (byte[]) in.readObject();
-                    System.out.println("Ho ricevuto un messaggio vocale");
                     for(Contact c : contacts){
                         if(c.getUsername().equalsIgnoreCase(fromUser))
                             c.addAudioMessage(fromUser, audio);
@@ -148,37 +166,56 @@ public class Client implements Runnable{
                 else if(res instanceof String && ((String) res).equalsIgnoreCase(Protocol.EMOJI)){
                     String fromUser = (String) in.readObject();
                     String ikon = (String) in.readObject();
-                    System.out.println("Ho ricevuto una emoji");
                     for(Contact c : contacts){
                         if(c.getUsername().equalsIgnoreCase(fromUser))
                             c.addEmojiMessage(fromUser, ikon);
                     }
                 }
-                else if(res instanceof String && ((String) res).equalsIgnoreCase(Protocol.CALL)){
+                else if(res instanceof String && (((String) res).equalsIgnoreCase(Protocol.FILE))){
                     String fromUser = (String) in.readObject();
-                    String mex = (String) in.readObject();
-                    sendMessageTo(Protocol.ACCEPT_CALL, username, fromUser, Protocol.ACCEPT_CALL);
-                    SceneHandler.getInstance().showCallWindow();
+                    Object data = in.readObject();
+                    for(Contact c : contacts){
+                        if(c.getUsername().equalsIgnoreCase(fromUser))
+                            c.addFileMessage(fromUser, (byte[])data);
+                    }
                 }
-                else if(res instanceof String && ((String) res).equalsIgnoreCase(Protocol.ACCEPT_CALL)){
+                else if(res instanceof String && ((String) res).equalsIgnoreCase(Protocol.IMAGE)){
+                    System.out.println("Ricevo immagine" + System.lineSeparator());
                     String fromUser = (String) in.readObject();
-                    String mex = (String) in.readObject();
-                    SceneHandler.getInstance().showCallWindow();
+                    Object data = in.readObject();
+                    for(Contact c : contacts){
+                        if(c.getUsername().equalsIgnoreCase(fromUser))
+                            c.addImageMessage(fromUser, (byte[])data);
+                    }
                 }
                 else{
-                    System.out.println("SERVER WROTE -> " + res + System.lineSeparator());
+                    return;
                 }
             } catch (IOException | ClassNotFoundException |ArrayIndexOutOfBoundsException e) {
+                reset();
                 return;
             }
         }
         return;
     }
 
-
+    public synchronized String reset(String username, String protocol){
+        String res = "";
+        sendObject(Protocol.RESETPASSWORD);
+        sendObject(username);
+        try {
+            in = new ObjectInputStream(socket.getInputStream());
+            res = (String) in.readObject();
+            System.out.println("SERVER HA INVIATO: " + res);
+        }catch(Exception e){
+            e.printStackTrace();
+            reset();
+            return res;
+        }
+        return res;
+    }
     //TODO: LOGIN/REGISTRATION METHOD
     public synchronized String connect(String username, String password, String email, String protocol) {
-        //TODO: ADD RESET PASSWORD
         String res = "";
         if(protocol.equalsIgnoreCase(Protocol.LOGIN)){
             sendObject(Protocol.LOGIN); //INVIO PROTOCOLLO
@@ -188,7 +225,6 @@ public class Client implements Runnable{
             try {
                 in = new ObjectInputStream(socket.getInputStream());
                 res = (String) in.readObject();  //RICEVO CONFERMA
-                System.out.println("SERVER WROTE: " + res + System.lineSeparator());
             } catch (IOException | ClassNotFoundException | NullPointerException e) {
                 reset();
                 return Protocol.CONNECTION_ERROR;
@@ -215,7 +251,7 @@ public class Client implements Runnable{
         return res;
     }
 
-    public boolean sendObject(Object ob){
+    public synchronized boolean sendObject(Object ob){
         if(out == null)
             return false;
         try {
@@ -228,13 +264,10 @@ public class Client implements Runnable{
         return false;
     }
 
-    public boolean sendMessageTo(String protocol, String fromUser, String toUser, Object mex){
+    public synchronized boolean sendMessageTo(String protocol, String fromUser, String toUser, Object mex){
         if(out == null)
             return false;
         try {
-            if(mex instanceof FontIcon){
-                System.out.println("INVIO EMOJI");
-            }
             out.writeObject(protocol);
             out.writeObject(fromUser);
             out.writeObject(toUser);

@@ -39,6 +39,7 @@ public class SceneHandler {
         scene = new Scene(fxmlLoader.load());
         scene.getStylesheets().add(this.getClass().getResource("signUpStyle.css").toExternalForm());
         stage.setTitle("Welcome");
+        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }
@@ -70,12 +71,15 @@ public class SceneHandler {
         stage.show();
     }
 
-    public void showCallWindow() throws IOException {
+    public void showCallWindow(String fromUser, String username) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("callFrame.fxml"));
         Parent root = (AnchorPane) fxmlLoader.load();
-        Dialog<String> d = new Dialog<>();
-        d.showAndWait();
+        stage.hide();
+        stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.show();
     }
+
 
     public void showError(String error){
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -84,29 +88,40 @@ public class SceneHandler {
         alert.showAndWait();
     }
 
-    public Image showImagePicker() {
+    public File showImagePicker() {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Choose an image");
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG files", "*.png"));
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JPG files", "*.jpg"));
         File file = chooser.showOpenDialog(stage);
         if(file != null){
-            Image tmp = new Image(file.toURI().toString());
-            return tmp;
+            return file;
         }
+        return null;
+    }
+
+    public File showFilePicker() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose a file to send");
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("all files", "*.*"));
+        File file = chooser.showOpenDialog(stage);
+        if(file != null)
+            return file;
         return null;
     }
 
     public void openEmojiTable(String username, String toUser) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("emojiTable.fxml"));
         Parent root = (BorderPane) fxmlLoader.load();
-        EmojiController controller = (EmojiController) fxmlLoader.getController();
-        controller.setUsername(username);
-        controller.setToUser(toUser);
+        //EmojiController controller = (EmojiController) fxmlLoader.getController();
+        EmojiController.getInstance().setUsername(username);
+        EmojiController.getInstance().setToUser(toUser);
         Stage tmp = new Stage();
+        tmp.setAlwaysOnTop(true);
         tmp.setScene(new Scene(root));
         tmp.setResizable(false);
         tmp.initStyle(StageStyle.UTILITY);
         tmp.show();
     }
+
 }

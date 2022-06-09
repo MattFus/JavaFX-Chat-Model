@@ -1,5 +1,6 @@
 package application.whatsup;
 
+import application.whatsup.Server.MainServer;
 import javafx.application.Application;
 import javafx.stage.Stage;
 

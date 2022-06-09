@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.security.SecureRandom;
 import java.sql.SQLException;
+import java.util.UUID;
 
 public class ConnectionHandler implements Runnable{
 
@@ -30,16 +32,32 @@ public class ConnectionHandler implements Runnable{
     @Override
     public void run() {
         try {
-            in = new ObjectInputStream(clientSocket.getInputStream());  //I receve protocol -> username -> password
+            in = new ObjectInputStream(clientSocket.getInputStream());  //User receives protocol -> username -> password
             String req = (String) in.readObject();
+            if(req.equalsIgnoreCase(Protocol.RESETPASSWORD)){
+                System.out.println("CLIENT HA INVIATO RESETPASSWORD");
+                String username = (String) in.readObject();
+                if(!DataBase.getInstance().existsUser(username)){
+                    sendObject(Protocol.USER_NOT_EXISTS);
+                    resetFields();
+                    return;
+                }
+                String generatedPassword = generatePassword();
+                String email = DataBase.getInstance().changePsw(username, generatedPassword);
+                System.out.println("DEVO INVIARE LA MAIL");
+                EmailSender.send(email, "Password Reset Request", generatedPassword);
+                System.out.println("EMAIL INVIATA");
+                sendObject(Protocol.RESETPASSWORD);
+                resetFields();
+                return;
+            }
             String username = (String) in.readObject();
             String password = (String) in.readObject();
-            System.out.println("SERVER RECEIVED: "+ req +" -> " +username+", "+password);
             this.username = username;
             //CASE: LOGIN
             if(req.equalsIgnoreCase(Protocol.LOGIN)){
                 User user = new User(username,password);
-                if(!DataBase.getInstance().checkUser(user)){
+                if(!DataBase.getInstance().checkUser(user)) {
                     sendObject(Protocol.LOGIN_ERROR);
                     resetFields();
                     return;
@@ -64,7 +82,6 @@ public class ConnectionHandler implements Runnable{
             //TODO: USERHANDLER CHE GESTISCE LE PERSONE CHE ENTRANO
             if(!UsersHandler.insertUser(username, this) || clientSocket.isClosed()) {
                 sendObject(Protocol.USER_ALREADY_LOGGED_IN);
-                username = null;
                 resetFields();
                 return;
             }
@@ -79,7 +96,6 @@ public class ConnectionHandler implements Runnable{
                 String toUser = (String) in.readObject();
                 Object message = in.readObject();
                 UsersHandler.sendMessage(protocol, fromUser, toUser, message);
-                System.out.println("Client wrote -> " + protocol +" FROM "+ fromUser + " TO "+ toUser + " -> " + message + System.lineSeparator());
             }
         } catch (IOException | ClassNotFoundException | SQLException e) {
             //e.printStackTrace();
@@ -87,7 +103,23 @@ public class ConnectionHandler implements Runnable{
             out = null;
             return;
         }
+        UsersHandler.removeUser(username);
+        try {
+            resetFields();
+        } catch (IOException e) {
+            return;
+        }
         return;
+    }
+
+    private String generatePassword() {
+        String alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        SecureRandom rnd = new SecureRandom();
+        StringBuilder sb = new StringBuilder(10);
+        for(int i = 0; i < 10; i++){
+            sb.append(alphabet.charAt(rnd.nextInt(alphabet.length())));
+        }
+        return alphabet;
     }
 
     public boolean sendObject(Object ob){
@@ -105,6 +137,7 @@ public class ConnectionHandler implements Runnable{
     }
 
     private void resetFields() throws IOException {
+        UsersHandler.removeUser(username);
         if (out != null)
             out.close();
         out = null;
