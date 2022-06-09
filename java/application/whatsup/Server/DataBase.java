@@ -1,11 +1,10 @@
 package application.whatsup.Server;
 
 import application.whatsup.Common.User;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import java.sql.*;
 
-public class DataBase {
+public class DataBase { //I deleted encryption framework, add the one you like the most
 
     private static DataBase instance = null;
     private Connection con = null;
@@ -36,7 +35,7 @@ public class DataBase {
             return false;
         PreparedStatement statement = con.prepareStatement("INSERT INTO Users VALUES(?,?,?);");
         statement.setString(1,user.getUsername());
-        statement.setString(2,BCrypt.hashpw(user.getPassword(), BCrypt.gensalt(12)));
+        statement.setString(2,encrypt(user.getPassword()));
         statement.setString(3,user.getEmail());
         statement.executeUpdate();
         statement.close();
@@ -81,7 +80,7 @@ public class DataBase {
         if(result.next()){
             email = result.getString("email");
             PreparedStatement statement1 = con.prepareStatement("UPDATE Users SET password=? WHERE username=?");
-            statement1.setString(1, BCrypt.hashpw(generatedPassword, BCrypt.gensalt(10)));
+            statement1.setString(1, encrypt(generatedPassword));
             statement1.setString(2, username);
             statement1.executeUpdate();
         }
