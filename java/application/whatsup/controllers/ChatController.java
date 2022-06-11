@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -442,8 +443,19 @@ public class ChatController extends AnimationTimer implements Initializable {
             label.setStyle("-fx-background-radius: 20 20 20 20;-fx-background-color: #423F3E; -fx-font-size: 20px; -fx-font-fill: white;");
             stack.setAlignment(Pos.CENTER_LEFT);
         }
-        Image image = new Image(new ByteArrayInputStream(parsed.getValue()), 350,350,false,false);
+        Image image = new Image(new ByteArrayInputStream(parsed.getValue()), 350,350,true,true);
         ImageView img = new ImageView(image);
+        label.setCursor(Cursor.HAND);
+        label.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                try {
+                    SceneHandler.getInstance().showImage(parsed.getValue());
+                } catch (IOException e) {
+                    return;
+                }
+            }
+        });
         label.setGraphic(new ImageView(image));
         label.setPadding(new Insets(15));
         stack.getChildren().add(label);

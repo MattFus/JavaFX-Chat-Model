@@ -94,11 +94,6 @@ public class ConnectionHandler implements Runnable{
             UsersHandler.sendMessageToAll(Protocol.USERHANDLER);
             UsersHandler.sendMessageToAll(UsersHandler.allUsers());
             return;
-        }finally {
-            UsersHandler.removeUser(username);
-            UsersHandler.sendMessageToAll(Protocol.USERHANDLER);
-            UsersHandler.sendMessageToAll(UsersHandler.allUsers());
-            return;
         }
     }
 

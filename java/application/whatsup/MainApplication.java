@@ -13,6 +13,7 @@ public class MainApplication extends Application {
     }
 
     public static void main(String[] args) {
+        //MainServer.main(args) //to start server with client
         launch();
     }
 }

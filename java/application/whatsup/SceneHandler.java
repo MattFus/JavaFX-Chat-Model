@@ -3,18 +3,23 @@ package application.whatsup;
 import application.whatsup.Client.Client;
 import application.whatsup.controllers.ChatController;
 import application.whatsup.controllers.EmojiController;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -89,7 +94,9 @@ public class SceneHandler {
         tmp.setResizable(false);
         tmp.getScene().setFill(Color.TRANSPARENT);
         tmp.initStyle(StageStyle.UNDECORATED);
-        tmp.showAndWait();
+        tmp.setX(stage.getWidth()/2);
+        tmp.setY(stage.getY()+(stage.getHeight()/4));
+        tmp.show();
         root.setOnMousePressed(pressEvent -> {
             root.setOnMouseDragged(dragEvent -> {
                 tmp.setX(dragEvent.getScreenX() - pressEvent.getSceneX());
@@ -108,13 +115,30 @@ public class SceneHandler {
         tmp.setResizable(false);
         tmp.getScene().setFill(Color.TRANSPARENT);
         tmp.initStyle(StageStyle.UNDECORATED);
-        tmp.showAndWait();
+        tmp.setX(stage.getWidth()/2);
+        tmp.setY(stage.getY()+(stage.getHeight()/3));
+        tmp.show();
         root.setOnMousePressed(pressEvent -> {
             root.setOnMouseDragged(dragEvent -> {
                 tmp.setX(dragEvent.getScreenX() - pressEvent.getSceneX());
                 tmp.setY(dragEvent.getScreenY() - pressEvent.getSceneY());
             });
         });
+    }
+
+    public void showImage(byte[] imgbytes) throws IOException {
+        Dialog<Image> dialog = new Dialog<Image>();
+        dialog.setTitle("Image");
+        Image img = new Image(new ByteArrayInputStream(imgbytes), 700, 600, true, true);
+        ImageView image = new ImageView(img);
+        dialog.getDialogPane().getChildren().add(image);
+        dialog.getDialogPane().setMinHeight(img.getHeight());
+        dialog.getDialogPane().setMinWidth(img.getWidth());
+        dialog.setX(stage.getX());
+        dialog.setY(stage.getY());
+        Window window = dialog.getDialogPane().getScene().getWindow();
+        window.setOnCloseRequest(event -> window.hide());
+        dialog.showAndWait();
     }
 
     public File showImagePicker() {
@@ -149,6 +173,8 @@ public class SceneHandler {
         tmp.setScene(new Scene(root));
         tmp.setResizable(false);
         tmp.initStyle(StageStyle.UTILITY);
+        tmp.setX(stage.getWidth()/2);
+        tmp.setY(stage.getY()+(stage.getHeight()/3));
         tmp.show();
     }
 
