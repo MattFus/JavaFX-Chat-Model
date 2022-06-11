@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="195.0" prefWidth="296.0" style="-fx-background-color: #06162b; -fx-background-radius: 5 5 5 5; -fx-border-width: 3 3 3 3; -fx-border-color: #06161F;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.whatsup.controllers.AboutController">
+   <children>
+      <BorderPane layoutX="39.0" layoutY="-11.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <bottom>
+            <Button id="button" fx:id="closeButton" mnemonicParsing="false" onAction="#onClickClose" prefHeight="40.0" prefWidth="70.0" stylesheets="@signUpStyle.css" text="Close" textFill="WHITE" BorderPane.alignment="CENTER">
+               <font>
+                  <Font name="Arial" size="18.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+         </bottom>
+         <top>
+            <Label id="label" fx:id="label" stylesheets="@signUpStyle.css" text="WHATSUP" textFill="#84c69b" BorderPane.alignment="CENTER">
+               <font>
+                  <Font name="Arial Black" size="27.0" />
+               </font>
+            </Label>
+         </top>
+         <center>
+            <VBox alignment="CENTER" prefHeight="71.0" prefWidth="290.0" spacing="20.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Label id="innerlabel" alignment="CENTER" prefHeight="19.0" prefWidth="225.0" stylesheets="@signUpStyle.css" text="Version: 1.0" textFill="#84c69b" />
+                  <Label id="innerlabel" alignment="CENTER" prefHeight="19.0" prefWidth="222.0" stylesheets="@signUpStyle.css" text="Creator: Matteo Fusaro" textFill="#84c69b" />
+               </children>
+            </VBox>
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>

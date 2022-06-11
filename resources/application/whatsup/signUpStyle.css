@@ -4,6 +4,21 @@
 
 #button{
     -fx-background-color: #84C69B;
+    -fx-font: 17 ikonli;
+}
+
+#button:hover{
+    -fx-font: 18 ikonli;
+}
+
+#label{
+    -fx-font-size: 40px;
+    -fx-font-family: ikonli;
+}
+
+#innerlabel{
+    -fx-font-size: 16px;
+    -fx-font-family: ikonli;
 }
 
 #textField{

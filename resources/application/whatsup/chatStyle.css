@@ -40,6 +40,15 @@
     -fx-scale-x: 0.9;
 }
 
+.menu-item .label{
+    -fx-text-fill: white;
+    -fx-font: 18 ikonli;
+}
+
+.menu-item:hover {
+    -fx--fx-background-color: #383838;
+}
+
 .menu-item:focused{
     -fx-background-color: transparent;
 }

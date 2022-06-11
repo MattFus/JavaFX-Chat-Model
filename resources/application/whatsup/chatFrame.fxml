@@ -32,7 +32,7 @@
                <children>
                   <BorderPane id="contactPane" layoutX="21.0" layoutY="191.0" prefHeight="582.0" prefWidth="241.0" style="-fx-background-color: #06162b;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <center>
-                        <ScrollPane fx:id="contactsScrollPane" prefWidth="245.0" style="-fx-background-color: #06162b;" BorderPane.alignment="CENTER">
+                        <ScrollPane fx:id="contactsScrollPane" hbarPolicy="NEVER" prefWidth="245.0" style="-fx-background-color: #06162b;" BorderPane.alignment="CENTER">
                            <content>
                               <VBox fx:id="contactsVBox" alignment="TOP_CENTER" minHeight="516.0" minWidth="246.0" style="-fx-background-color: #06162b;">
                                  <children>
@@ -45,9 +45,9 @@
                      <top>
                         <BorderPane prefHeight="94.0" prefWidth="220.0" style="-fx-background-color: #06162b;" BorderPane.alignment="CENTER">
                            <center>
-                              <Label prefHeight="51.0" prefWidth="152.0" style="-fx-background-color: transparent;" text="WHATSUP" textFill="WHITE" BorderPane.alignment="CENTER">
+                              <Label prefHeight="51.0" prefWidth="152.0" style="-fx-background-color: transparent;" text="WHATSUP" textFill="#84c69b" BorderPane.alignment="CENTER">
                                  <font>
-                                    <Font name="Malgun Gothic" size="32.0" />
+                                    <Font name="Ikonli" size="32.0" />
                                  </font>
                               </Label>
                            </center>
@@ -73,11 +73,50 @@
                               </HBox>
                            </bottom>
                            <left>
-                              <Circle fx:id="userAccountImage" fill="WHITE" radius="35.0" stroke="BLACK" strokeLineCap="ROUND" strokeType="INSIDE" BorderPane.alignment="CENTER">
+                              <MenuButton mnemonicParsing="false" prefHeight="50.0" prefWidth="74.0" style="-fx-background-radius: 20 20 20 20; -fx-background-color: transparent;" BorderPane.alignment="CENTER">
+                                <items>
+                                  <MenuItem mnemonicParsing="false" onAction="#onClickChangePassword">
+                                       <graphic>
+                                          <Label text="Change Password" textFill="WHITE">
+                                             <font>
+                                                <Font name="Ikonli" size="12.0" />
+                                             </font>
+                                             <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                             </cursor>
+                                          </Label>
+                                       </graphic>
+                                    </MenuItem>
+                                  <MenuItem mnemonicParsing="false" onAction="#onClickChangeImage">
+                                       <graphic>
+                                          <Label text="Upload Photo">
+                                             <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                             </cursor>
+                                          </Label>
+                                       </graphic>
+                                    </MenuItem>
+                                    <MenuItem mnemonicParsing="false" onAction="#onClickShowInfo">
+                                       <graphic>
+                                          <Label text="About">
+                                             <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                             </cursor>
+                                          </Label>
+                                       </graphic>
+                                    </MenuItem>
+                                </items>
+                                 <graphic>
+                                    <Circle fx:id="userAccountImage" fill="WHITE" radius="29.0" stroke="BLACK" strokeLineCap="ROUND" strokeType="INSIDE">
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                    </Circle>
+                                 </graphic>
                                  <cursor>
                                     <Cursor fx:constant="HAND" />
                                  </cursor>
-                              </Circle>
+                              </MenuButton>
                            </left>
                         </BorderPane>
                      </top>
@@ -88,19 +127,18 @@
                <items>
                   <BorderPane id="chatPane" fx:id="chatBorderPane" style="-fx-background-color: #1A2F4B; -fx-background-radius: 0 0 5 5;">
                      <top>
-                        <GridPane fx:id="contact_call_videoCallGridPane" prefHeight="69.0" prefWidth="835.0" visible="false">
+                        <GridPane fx:id="contact_include_gridPane" prefHeight="69.0" prefWidth="835.0" visible="false">
                            <columnConstraints>
                               <ColumnConstraints hgrow="SOMETIMES" maxWidth="627.0" minWidth="10.0" prefWidth="84.0" />
                               <ColumnConstraints hgrow="SOMETIMES" maxWidth="642.0" minWidth="10.0" prefWidth="559.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="438.0" minWidth="10.0" prefWidth="83.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="438.0" minWidth="10.0" prefWidth="94.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="438.0" minWidth="10.0" prefWidth="107.0" />
                            </columnConstraints>
                            <rowConstraints>
-                              <RowConstraints maxHeight="61.0" minHeight="10.0" prefHeight="57.0" vgrow="SOMETIMES" />
-                              <RowConstraints maxHeight="25.0" minHeight="8.0" prefHeight="19.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="69.0" minHeight="10.0" prefHeight="67.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="25.0" minHeight="0.0" prefHeight="2.0" vgrow="SOMETIMES" />
                            </rowConstraints>
                            <children>
-                              <FontIcon iconColor="WHITE" iconLiteral="mdi-account-circle" iconSize="60" wrappingWidth="60.0" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                              <FontIcon iconColor="WHITE" iconLiteral="mdi-account-circle" iconSize="70" wrappingWidth="80.0" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                                  <cursor>
                                     <Cursor fx:constant="HAND" />
                                  </cursor></FontIcon>
@@ -115,19 +153,10 @@
                                     <Cursor fx:constant="HAND" />
                                  </cursor>
                               </Label>
-                              <Button fx:id="callButton" mnemonicParsing="false" onAction="#onClickCall" style="-fx-background-color: #84C69B; -fx-background-radius: 20 20 20 20;" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
-                                 <graphic>
-                                    <FontIcon iconColor="WHITE" iconLiteral="mdi-phone" iconSize="35" />
-                                 </graphic>
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
-                              </Button>
                               <Separator opacity="0.2" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                               <Separator opacity="0.2" prefHeight="5.0" prefWidth="149.0" GridPane.rowIndex="1" />
                               <Separator opacity="0.2" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                              <Separator opacity="0.2" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                              <MenuButton fx:id="includeButton" contentDisplay="CENTER" mnemonicParsing="false" style="-fx-background-color: #84C69B; -fx-background-radius: 15 15 15 15;" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                              <MenuButton fx:id="includeButton" contentDisplay="CENTER" mnemonicParsing="false" style="-fx-background-color: #84C69B; -fx-background-radius: 15 15 15 15;" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                                  <graphic>
                                     <FontIcon iconColor="WHITE" iconLiteral="mdi-paperclip" iconSize="35" />
                                  </graphic>
