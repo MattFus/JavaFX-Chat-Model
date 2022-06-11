@@ -12,5 +12,5 @@
     <li> - [x] Emoticons
     <li> - [x] Voice messages
     <li> - [x] Images
-<li> - [x] Files <code>80%</code>
+    <li> - [x] Files 
   
