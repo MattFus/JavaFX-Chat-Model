@@ -46,16 +46,18 @@
 }
 
 .menu-item:hover {
-    -fx--fx-background-color: #383838;
+    -fx--fx-background-color: #84C69B;
 }
 
 .menu-item:focused{
-    -fx-background-color: transparent;
+    -fx-background-color: #6FA683;
+    -fx-background-radius: 15 15 15 15;
 }
 
 .context-menu {
     -fx-background-color:  #84C69B;
     -fx-background-radius: 15 15 15 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
 }
 
 .button:hover {
