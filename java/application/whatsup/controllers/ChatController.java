@@ -26,11 +26,9 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.util.Pair;
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
@@ -50,25 +48,16 @@ public class ChatController extends AnimationTimer implements Initializable {
     private ScrollPane allMessagesScrollArea;
 
     @FXML
-    private Button callButton;
-
-    @FXML
     private SplitPane chatInfoSplitPane;
 
     @FXML
-    private GridPane contact_call_videoCallGridPane;
+    private GridPane contact_include_gridPane;
 
     @FXML
     private Label contact_nameField;
 
     @FXML
-    private Button emoButton;
-
-    @FXML
     private Button micButton;
-
-    @FXML
-    private MenuButton includeButton;
 
     @FXML
     private Circle recDotIndicator;
@@ -91,11 +80,6 @@ public class ChatController extends AnimationTimer implements Initializable {
     private VBox contactsVBox;
 
     @FXML
-    private Label contactNameLabelField;
-    @FXML
-    private SplitPane contacts_chat_splitPane;
-
-    @FXML
     private ScrollPane contactsScrollPane;
 
     @FXML
@@ -116,20 +100,21 @@ public class ChatController extends AnimationTimer implements Initializable {
             contacts = Client.getInstance().getUsers();
             contactsVBox.getChildren().clear();
             contactLabels = new Vector<Pane>();
-            for(Contact c : contacts){
-                if(!c.getUsername().equalsIgnoreCase(username)) {
+            for (Contact c : contacts) {
+                if (!c.getUsername().equalsIgnoreCase(username)) {
                     contactLabels.add(addContact(c.getUsername()));
                 }
             }
         }
         //TODO: SEARCHFIELD
-        for(Pane p : contactLabels){
-            if(!p.getId().contains(searchField.getText())){
-                contactsVBox.getChildren().remove(p);
-            }
-            else {
-                if(!contactsVBox.getChildren().contains(p)){
-                    contactsVBox.getChildren().add(p);
+        if (contactLabels != null){
+            for (Pane p : contactLabels) {
+                if (!p.getId().contains(searchField.getText())) {
+                    contactsVBox.getChildren().remove(p);
+                } else {
+                    if (!contactsVBox.getChildren().contains(p)) {
+                        contactsVBox.getChildren().add(p);
+                    }
                 }
             }
         }
@@ -140,10 +125,10 @@ public class ChatController extends AnimationTimer implements Initializable {
                 Vector<Pair<String, String>> messages = Client.getInstance().getMessages(userChat); //<-- HERE
                 Vector<Pair<String, byte[]>> audioMessages = Client.getInstance().getAudioMessages(userChat); //<-- HERE
                 Vector<Pair<String, String>> emojiMessages = Client.getInstance().getEmojiMessages(userChat); //<-- HERE
-                Vector<Pair<String, byte[]>> fileMessages = Client.getInstance().getFileMessages(userChat);
+                Vector<Pair<String, File>> fileMessages = Client.getInstance().getFileMessages(userChat);
                 Vector<Pair<String, byte[]>> imageMessages = Client.getInstance().getImageMessages(userChat);
                 //TODO: MESSAGES
-                if(!messages.isEmpty() && allMessages != null){
+                if(messages != null && !messages.isEmpty() && allMessages != null){
                     for(Pair<String,String> parsed : messages) {
                         if (parsed.getKey().equalsIgnoreCase(username)) {
                             //MY MESSAGE
@@ -157,7 +142,7 @@ public class ChatController extends AnimationTimer implements Initializable {
                     }
                 }
                 //TODO: AUDIO MESSAGES
-                if(!audioMessages.isEmpty() && allMessages != null){
+                if(audioMessages != null && !audioMessages.isEmpty() && allMessages != null){
                     for(Pair<String, byte[]> parsed : audioMessages) {
                         if (parsed.getKey().equalsIgnoreCase(username)) {
                             //MY AUDIO MESSAGE
@@ -171,7 +156,7 @@ public class ChatController extends AnimationTimer implements Initializable {
                     }
                 }
                 //TODO: EMOTICON MESSAGES
-                if(!emojiMessages.isEmpty() && allMessages != null){
+                if(emojiMessages != null && !emojiMessages.isEmpty() && allMessages != null){
                     for(Pair<String, String> parsed : emojiMessages) {
                         if (parsed.getKey().equalsIgnoreCase(username)) {
                             StackPane flow = emojiMessagesMaker(parsed, true);
@@ -183,8 +168,8 @@ public class ChatController extends AnimationTimer implements Initializable {
                     }
                 }
                 //TODO: FILE MESSAGES
-                if(!fileMessages.isEmpty() && allMessages != null){
-                    for(Pair<String, byte[]> parsed : fileMessages){
+                if(fileMessages != null && !fileMessages.isEmpty() && allMessages != null){
+                    for(Pair<String, File> parsed : fileMessages){
                         if(parsed.getKey().equalsIgnoreCase(username)){
                             StackPane flow = fileMessagesMaker(parsed, true);
                             allMessages.getChildren().add(flow);
@@ -195,7 +180,7 @@ public class ChatController extends AnimationTimer implements Initializable {
                     }
                 }
                 //TODO: IMAGE MESSAGE
-                if(!imageMessages.isEmpty() && allMessages != null){
+                if(imageMessages != null && !imageMessages.isEmpty() && allMessages != null){
                     for(Pair<String, byte[]> parsed : imageMessages){
                         System.out.println(parsed.getKey() + System.lineSeparator());
                         if(parsed.getKey().equalsIgnoreCase(username)){
@@ -225,7 +210,7 @@ public class ChatController extends AnimationTimer implements Initializable {
     }
                 //TODO: AUDIOMESSAGE BUTTON
     @FXML
-    void onClickRecord(ActionEvent event) { //BEADS-PROJECT??
+    void onClickRecord(ActionEvent event) {
         if(!contact_nameField.getText().isEmpty()) {
             ByteArrayOutputStream out;
             micButton.setDisable(true);
@@ -252,20 +237,16 @@ public class ChatController extends AnimationTimer implements Initializable {
     void onClickCall(ActionEvent event) throws IOException {
 
     }
-                //TODO: SEND FILE BUTTON
+                //TODO: SEND FILE BUTTON (FILE OBJECT IS SERIALIZABLE)
     @FXML
     void onClickSendFile(ActionEvent event) throws IOException {
         File file = SceneHandler.getInstance().showFilePicker();
         if(file != null && !contact_nameField.getText().isEmpty() && !file.getName().contains("\\/.:")) { //to avoid path traversal
-            FileInputStream in = new FileInputStream(file.getAbsolutePath());
-            byte[] fileData = new byte[(int)file.length()];
-            in.read(fileData);
-            Client.getInstance().addFileMessage(username, contact_nameField.getText(), fileData);
-            String fileExt = FilenameUtils.getExtension(file.getName());
-            Client.getInstance().sendMessageTo(Protocol.FILE, username, contact_nameField.getText(), fileData);
+            Client.getInstance().addFileMessage(username, contact_nameField.getText(), file);
+            Client.getInstance().sendMessageTo(Protocol.FILE, username, contact_nameField.getText(), file);
         }
     }
-                //TODO: SEND IMAGE BUTTON
+                //TODO: SEND IMAGE BUTTON (IMAGE ISN'T SERIALIZABLE)
     @FXML
     void onClickSendImage(ActionEvent event) throws IOException {
         File file = SceneHandler.getInstance().showImagePicker();
@@ -285,6 +266,26 @@ public class ChatController extends AnimationTimer implements Initializable {
         SceneHandler.getInstance().openEmojiTable(username, contact_nameField.getText());
     }
 
+
+    @FXML
+    void onClickChangeImage(ActionEvent event) {
+        File file = SceneHandler.getInstance().showImagePicker();
+        if(file != null){
+            //TODO: Need to insert and retrieve image from database
+            userAccountImage.setFill(new ImagePattern(new Image(file.toURI().toString())));
+        }
+    }
+
+    @FXML
+    void onClickChangePassword(ActionEvent event) throws IOException {
+        SceneHandler.getInstance().showChangePassword();
+    }
+
+    @FXML
+    void onClickShowInfo(ActionEvent event) throws IOException {
+        SceneHandler.getInstance().showInfos();
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         //To not resize on MasterWindow resizing
@@ -301,31 +302,12 @@ public class ChatController extends AnimationTimer implements Initializable {
         contactsScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         allMessages.prefWidthProperty().bind(allMessagesScrollArea.widthProperty());
         allMessages.setSpacing(5);
-        allMessages.setPadding(new Insets(5));
+        allMessages.setPadding(new Insets(10));
         allMessagesScrollArea.vvalueProperty().bind(allMessages.heightProperty());
         //panel allocator
         contactInfo = new AnchorPane();
         contactInfo.setMinSize(200,chatInfoSplitPane.getHeight());
         contactInfo.setVisible(false);
-
-        //EventHandlers
-        contact_nameField.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                contactInfo.setVisible(true);
-            }
-        });
-
-        userAccountImage.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                File file = SceneHandler.getInstance().showImagePicker();
-                if(file != null){
-                    //TODO: Need to insert and retrieve image from database
-                    userAccountImage.setFill(new ImagePattern(new Image(file.toURI().toString())));
-                }
-            }
-        });
 
         messageArea.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
@@ -354,13 +336,16 @@ public class ChatController extends AnimationTimer implements Initializable {
         pane.setLeft(icon);
         pane.setCenter(label);
         pane.setBottom(new Separator());
-        pane.setOnMouseClicked(event -> {
-            contact_call_videoCallGridPane.setVisible(true);
-            allMessagesScrollArea.setVisible(true);
-            if(!contact_nameField.getText().equalsIgnoreCase(user)) //if contact changes, chat will reset
-                allMessages.getChildren().clear();
-            contact_nameField.setText(user);
-            EmojiController.getInstance().setToUser(user);
+        pane.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                contact_include_gridPane.setVisible(true);
+                allMessagesScrollArea.setVisible(true);
+                if(!contact_nameField.getText().equalsIgnoreCase(user)) //if contact changes, chat will reset
+                    allMessages.getChildren().clear();
+                contact_nameField.setText(user);
+                EmojiController.getInstance().setToUser(user);
+            }
         });
         pane.setId(user);
         return pane;
@@ -428,7 +413,7 @@ public class ChatController extends AnimationTimer implements Initializable {
         return stack;
     }
 
-    private StackPane fileMessagesMaker(Pair<String, byte[]> parsed, boolean user){
+    private StackPane fileMessagesMaker(Pair<String, File> parsed, boolean user){
         StackPane stack = new StackPane();
         FileLabel label = new FileLabel(parsed.getValue());
         label.setPadding(new Insets(5));

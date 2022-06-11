@@ -1,10 +1,11 @@
 package application.whatsup.Server;
 
 import application.whatsup.Common.User;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import java.sql.*;
 
-public class DataBase { //I deleted encryption framework, add the one you like the most
+public class DataBase {
 
     private static DataBase instance = null;
     private Connection con = null;
@@ -15,7 +16,7 @@ public class DataBase { //I deleted encryption framework, add the one you like t
             String url = "jdbc:sqlite:Database.db"; //STARTING DB CONNECTION
             con = DriverManager.getConnection(url);
         } catch (SQLException | ClassNotFoundException e) {
-            System.out.println("Cannot connect to database");
+            //System.out.println("Cannot connect to database");
             this.instance = null;
             con = null;
         }
@@ -35,7 +36,7 @@ public class DataBase { //I deleted encryption framework, add the one you like t
             return false;
         PreparedStatement statement = con.prepareStatement("INSERT INTO Users VALUES(?,?,?);");
         statement.setString(1,user.getUsername());
-        statement.setString(2,encrypt(user.getPassword()));
+        statement.setString(2,BCrypt.hashpw(user.getPassword(), BCrypt.gensalt(12)));
         statement.setString(3,user.getEmail());
         statement.executeUpdate();
         statement.close();
@@ -70,20 +71,16 @@ public class DataBase { //I deleted encryption framework, add the one you like t
         return check;
     }
 
-    public String changePsw(String username, String generatedPassword) throws SQLException {
-        if(con == null || con.isClosed() || username == null)
-            return null;
-        String email = "";
-        PreparedStatement statement = con.prepareStatement("SELECT * FROM Users WHERE username=?;");
-        statement.setString(1, username);
-        ResultSet result = statement.executeQuery();
-        if(result.next()){
-            email = result.getString("email");
+    public boolean changePsw(String username, String oldPassword, String newPassword) throws SQLException {
+        if(con == null || con.isClosed() || username == null || oldPassword == null || newPassword == null)
+            return false;
+        if(checkUser(new User(username, oldPassword))) {
             PreparedStatement statement1 = con.prepareStatement("UPDATE Users SET password=? WHERE username=?");
-            statement1.setString(1, encrypt(generatedPassword));
+            statement1.setString(1, BCrypt.hashpw(newPassword, BCrypt.gensalt(10)));
             statement1.setString(2, username);
             statement1.executeUpdate();
+            return true;
         }
-        return email;
+        return false;
     }
 }

@@ -2,7 +2,6 @@ package application.whatsup.Server;
 
 import application.whatsup.Common.Protocol;
 import application.whatsup.Common.User;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -10,7 +9,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.SecureRandom;
 import java.sql.SQLException;
-import java.util.UUID;
 
 public class ConnectionHandler implements Runnable{
 
@@ -34,23 +32,6 @@ public class ConnectionHandler implements Runnable{
         try {
             in = new ObjectInputStream(clientSocket.getInputStream());  //User receives protocol -> username -> password
             String req = (String) in.readObject();
-            if(req.equalsIgnoreCase(Protocol.RESETPASSWORD)){
-                System.out.println("CLIENT HA INVIATO RESETPASSWORD");
-                String username = (String) in.readObject();
-                if(!DataBase.getInstance().existsUser(username)){
-                    sendObject(Protocol.USER_NOT_EXISTS);
-                    resetFields();
-                    return;
-                }
-                String generatedPassword = generatePassword();
-                String email = DataBase.getInstance().changePsw(username, generatedPassword);
-                System.out.println("DEVO INVIARE LA MAIL");
-                EmailSender.send(email, "Password Reset Request", generatedPassword);
-                System.out.println("EMAIL INVIATA");
-                sendObject(Protocol.RESETPASSWORD);
-                resetFields();
-                return;
-            }
             String username = (String) in.readObject();
             String password = (String) in.readObject();
             this.username = username;
@@ -59,7 +40,7 @@ public class ConnectionHandler implements Runnable{
                 User user = new User(username,password);
                 if(!DataBase.getInstance().checkUser(user)) {
                     sendObject(Protocol.LOGIN_ERROR);
-                    resetFields();
+                    clientSocket.close();
                     return;
                 }
             }
@@ -69,20 +50,20 @@ public class ConnectionHandler implements Runnable{
                 User user = new User(username, password, email);
                 if(!DataBase.getInstance().insertUser(user)){
                     sendObject(Protocol.REGISTRATION_ERROR);
-                    resetFields();
+                    clientSocket.close();
                     return;
                 }
             }
             else{                                                  //------->ALTRO
                 sendObject(Protocol.CONNECTION_ERROR);
-                resetFields();
+                clientSocket.close();
                 return;
             }
             //IF I'M HERE THEN IM LOGGED IN
             //TODO: USERHANDLER CHE GESTISCE LE PERSONE CHE ENTRANO
             if(!UsersHandler.insertUser(username, this) || clientSocket.isClosed()) {
                 sendObject(Protocol.USER_ALREADY_LOGGED_IN);
-                resetFields();
+                clientSocket.close();
                 return;
             }
             sendObject(Protocol.RECEIVED); //TODO: è ANDATO TUTTO BENE
@@ -95,21 +76,30 @@ public class ConnectionHandler implements Runnable{
                 String fromUser = (String) in.readObject();
                 String toUser = (String) in.readObject();
                 Object message = in.readObject();
+                if(protocol.equalsIgnoreCase(Protocol.RESETPASSWORD)){
+                    String oldPassword = toUser;
+                    String newPassword = (String) message;
+                    if(DataBase.getInstance().changePsw(username,oldPassword,newPassword)){
+                        UsersHandler.sendMessage(protocol, username, username, Protocol.OK);
+                    }
+                    else{
+                        UsersHandler.sendMessage(protocol, username, username, Protocol.RESETERROR);
+                    }
+                    continue;
+                }
                 UsersHandler.sendMessage(protocol, fromUser, toUser, message);
             }
         } catch (IOException | ClassNotFoundException | SQLException e) {
-            //e.printStackTrace();
             UsersHandler.removeUser(username);
-            out = null;
+            UsersHandler.sendMessageToAll(Protocol.USERHANDLER);
+            UsersHandler.sendMessageToAll(UsersHandler.allUsers());
+            return;
+        }finally {
+            UsersHandler.removeUser(username);
+            UsersHandler.sendMessageToAll(Protocol.USERHANDLER);
+            UsersHandler.sendMessageToAll(UsersHandler.allUsers());
             return;
         }
-        UsersHandler.removeUser(username);
-        try {
-            resetFields();
-        } catch (IOException e) {
-            return;
-        }
-        return;
     }
 
     private String generatePassword() {
@@ -119,7 +109,7 @@ public class ConnectionHandler implements Runnable{
         for(int i = 0; i < 10; i++){
             sb.append(alphabet.charAt(rnd.nextInt(alphabet.length())));
         }
-        return alphabet;
+        return sb.toString();
     }
 
     public boolean sendObject(Object ob){
@@ -131,6 +121,8 @@ public class ConnectionHandler implements Runnable{
         } catch (IOException e) {
             out = null;
             UsersHandler.removeUser(username);
+            UsersHandler.sendMessageToAll(Protocol.USERHANDLER);
+            UsersHandler.sendMessageToAll(UsersHandler.allUsers());
             return false;
         }
         return false;
@@ -138,6 +130,8 @@ public class ConnectionHandler implements Runnable{
 
     private void resetFields() throws IOException {
         UsersHandler.removeUser(username);
+        UsersHandler.sendMessageToAll(Protocol.USERHANDLER);
+        UsersHandler.sendMessageToAll(UsersHandler.allUsers());
         if (out != null)
             out.close();
         out = null;
@@ -148,5 +142,6 @@ public class ConnectionHandler implements Runnable{
             clientSocket.close();
         clientSocket = null;
         username = null;
+        Thread.currentThread().interrupt();
     }
 }

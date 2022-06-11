@@ -1,17 +1,16 @@
 package application.whatsup;
 
 import application.whatsup.Client.Client;
-import application.whatsup.controllers.CallController;
 import application.whatsup.controllers.ChatController;
 import application.whatsup.controllers.EmojiController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Dialog;
-import javafx.scene.image.Image;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -71,21 +70,51 @@ public class SceneHandler {
         stage.show();
     }
 
-    public void showCallWindow(String fromUser, String username) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("callFrame.fxml"));
-        Parent root = (AnchorPane) fxmlLoader.load();
-        stage.hide();
-        stage = new Stage();
-        stage.setScene(new Scene(root));
-        stage.show();
+
+    public void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Warning");
+        alert.setHeaderText("");
+        alert.setContentText(message);
+        alert.show();
     }
 
+    public void showChangePassword() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("changePassword.fxml"));
+        Parent root = (AnchorPane) fxmlLoader.load();
+        root.setEffect(new DropShadow());
+        Stage tmp = new Stage();
+        tmp.setAlwaysOnTop(true);
+        tmp.setScene(new Scene(root));
+        tmp.setResizable(false);
+        tmp.getScene().setFill(Color.TRANSPARENT);
+        tmp.initStyle(StageStyle.UNDECORATED);
+        tmp.showAndWait();
+        root.setOnMousePressed(pressEvent -> {
+            root.setOnMouseDragged(dragEvent -> {
+                tmp.setX(dragEvent.getScreenX() - pressEvent.getSceneX());
+                tmp.setY(dragEvent.getScreenY() - pressEvent.getSceneY());
+            });
+        });
+    }
 
-    public void showError(String error){
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(error);
-        alert.setContentText("Cannot connect to Server!\nTry Again.");
-        alert.showAndWait();
+    public void showInfos() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("infos.fxml"));
+        Parent root = (AnchorPane) fxmlLoader.load();
+        root.setEffect(new DropShadow());
+        Stage tmp = new Stage();
+        tmp.setAlwaysOnTop(true);
+        tmp.setScene(new Scene(root));
+        tmp.setResizable(false);
+        tmp.getScene().setFill(Color.TRANSPARENT);
+        tmp.initStyle(StageStyle.UNDECORATED);
+        tmp.showAndWait();
+        root.setOnMousePressed(pressEvent -> {
+            root.setOnMouseDragged(dragEvent -> {
+                tmp.setX(dragEvent.getScreenX() - pressEvent.getSceneX());
+                tmp.setY(dragEvent.getScreenY() - pressEvent.getSceneY());
+            });
+        });
     }
 
     public File showImagePicker() {
@@ -113,7 +142,6 @@ public class SceneHandler {
     public void openEmojiTable(String username, String toUser) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("emojiTable.fxml"));
         Parent root = (BorderPane) fxmlLoader.load();
-        //EmojiController controller = (EmojiController) fxmlLoader.getController();
         EmojiController.getInstance().setUsername(username);
         EmojiController.getInstance().setToUser(toUser);
         Stage tmp = new Stage();

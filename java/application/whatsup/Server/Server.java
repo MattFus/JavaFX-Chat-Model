@@ -21,12 +21,12 @@ public class Server implements Runnable{
     @Override
     public void run() {
         while(!Thread.currentThread().isInterrupted()){
-            System.out.println("[SERVER] Waiting for connections...");
+            //System.out.println("[SERVER] Waiting for connections...");
             try {
                 Socket clientSocket = server.accept();
                 ConnectionHandler handle = new ConnectionHandler(clientSocket);
                 executor.submit(handle);
-                System.out.println("Connected!");
+                //System.out.println("Connected!");
             } catch (IOException e) {
                 Thread.currentThread().interrupt();
                 return;

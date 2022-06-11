@@ -16,6 +16,7 @@ public class UsersHandler {
 
     public synchronized static void removeUser(String username){
         users.remove(username);
+
     }
 
     public synchronized static ArrayList<String> allUsers(){

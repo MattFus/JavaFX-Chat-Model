@@ -76,8 +76,6 @@ public class AudioController implements Runnable{
                 while (!stop) {
                     // Here application starts recording data
                     numBytesRead = microphone.read(data, 0, CHUNK_SIZE);
-                    bytesRead = bytesRead + numBytesRead;
-                    System.out.println(bytesRead);
                     out.write(data, 0, numBytesRead);
                 }
             } catch (Exception e) {
@@ -85,11 +83,13 @@ public class AudioController implements Runnable{
             }
             microphone.stop();
             microphone.close();
-            System.out.println("Stopped recording! Saving...");
         } catch (LineUnavailableException ex) {
+            SceneHandler.getInstance().showError("Cannot find any microphone!");
             return;
             //System.out.println("Cannot find any microphone");
         }
+        stop = false;
+        System.out.println(stop);
     }
 
     public void reproduceAudio(byte[] data){
@@ -106,13 +106,13 @@ public class AudioController implements Runnable{
             sourceDataLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
             sourceDataLine.open(format);
         } catch (LineUnavailableException e) {
-            e.printStackTrace();
+            return;
         }
         sourceDataLine.start();
         int cnt = 0;
         byte tempBuffer[] = new byte[10000];
         try {
-            while ((cnt = audioInputStream.read(tempBuffer, 0,tempBuffer.length)) != -1) {
+            while (((cnt = audioInputStream.read(tempBuffer, 0,tempBuffer.length)) != -1)) {
                 if (cnt > 0) {
                     // Write data to the internal buffer of
                     // the data line where it will be
@@ -121,19 +121,12 @@ public class AudioController implements Runnable{
                 }// end if
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            return;
         }
         // Block and wait for internal buffer of the
         // data line to empty.
         sourceDataLine.drain();
         sourceDataLine.close();
-    }
-
-    public void setAudioWindow(String fromUser, String username) throws IOException {
-        SceneHandler.getInstance().showCallWindow(fromUser, username);
-    }
-
-    public void setChatScene() throws IOException {
-        SceneHandler.getInstance().setChatWindow();
+        stop = false;
     }
 }

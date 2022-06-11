@@ -2,10 +2,9 @@ package application.whatsup.Client;
 
 import application.whatsup.Common.Protocol;
 import application.whatsup.SceneHandler;
-import application.whatsup.controllers.AudioController;
 import javafx.util.Pair;
-import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -20,6 +19,7 @@ public class Client implements Runnable{
     private ObjectInputStream in;
     private static Client instance = null;
     private String username;
+    private String password;
     private Vector<Contact> contacts;
 
     private boolean contactsModified;
@@ -71,7 +71,7 @@ public class Client implements Runnable{
         return null;
     }
 
-    public Vector<Pair<String, byte[]>> getFileMessages(String user){
+    public Vector<Pair<String, File>> getFileMessages(String user){
         for(Contact c : contacts){
             if(c.getUsername().equalsIgnoreCase(user))
                 return c.getUserFileMessages();
@@ -108,10 +108,10 @@ public class Client implements Runnable{
         }
     }
 
-    public void addFileMessage(String fromUser, String toUser, byte[] fileData){
+    public void addFileMessage(String fromUser, String toUser, File file){
         for(Contact c : contacts){
             if(c.getUsername().equalsIgnoreCase(toUser))
-                c.addFileMessage(fromUser, fileData);
+                c.addFileMessage(fromUser, file);
         }
     }
 
@@ -136,7 +136,7 @@ public class Client implements Runnable{
         while(out != null && in != null){
             try {
                 Object res = in.readObject();
-                //TODO:If I receive "USERHANDLER" then i have to update contacts
+                //TODO: If I receive "USERHANDLER" then I have to update contacts
                 if(((String) res).equalsIgnoreCase(Protocol.USERHANDLER)){
                     String str = (String) res;
                     ArrayList<String> contactsList = (ArrayList<String>) in.readObject();
@@ -147,6 +147,7 @@ public class Client implements Runnable{
                     }
                     contactsModified = true;
                 }
+                //TODO: If I receive "MESSAGE" then I have to update user messages
                 else if(res instanceof String && ((String) res).equalsIgnoreCase(Protocol.MESSAGE)){
                     String fromUser =(String) in.readObject();
                     String mex = (String) in.readObject();
@@ -155,6 +156,7 @@ public class Client implements Runnable{
                             c.addMessage(fromUser, mex);
                     }
                 }
+                //TODO: If I receive "AUDIO_MESSAGE" then I have to update userAudio messages
                 else if(res instanceof String && ((String) res).equalsIgnoreCase(Protocol.AUDIO_MESSAGE)){
                     String fromUser = (String) in.readObject();
                     byte[] audio = (byte[]) in.readObject();
@@ -163,6 +165,7 @@ public class Client implements Runnable{
                             c.addAudioMessage(fromUser, audio);
                     }
                 }
+                //TODO: If I receive "EMOJI" then I have to update userEmojis
                 else if(res instanceof String && ((String) res).equalsIgnoreCase(Protocol.EMOJI)){
                     String fromUser = (String) in.readObject();
                     String ikon = (String) in.readObject();
@@ -171,16 +174,17 @@ public class Client implements Runnable{
                             c.addEmojiMessage(fromUser, ikon);
                     }
                 }
+                //TODO: If I receive "FILE" then I have to update userFiles
                 else if(res instanceof String && (((String) res).equalsIgnoreCase(Protocol.FILE))){
                     String fromUser = (String) in.readObject();
-                    Object data = in.readObject();
+                    Object file = in.readObject();
                     for(Contact c : contacts){
                         if(c.getUsername().equalsIgnoreCase(fromUser))
-                            c.addFileMessage(fromUser, (byte[])data);
+                            c.addFileMessage(fromUser, (File) file);
                     }
                 }
+                //TODO: If I receive "IMAGE" then I have to update userImages
                 else if(res instanceof String && ((String) res).equalsIgnoreCase(Protocol.IMAGE)){
-                    System.out.println("Ricevo immagine" + System.lineSeparator());
                     String fromUser = (String) in.readObject();
                     Object data = in.readObject();
                     for(Contact c : contacts){
@@ -188,67 +192,66 @@ public class Client implements Runnable{
                             c.addImageMessage(fromUser, (byte[])data);
                     }
                 }
+                else if(res instanceof String && ((String) res).equalsIgnoreCase(Protocol.RESETPASSWORD)){
+                    String result = (String) in.readObject();
+                    String data = (String) in.readObject();
+                    SceneHandler.getInstance().showError("Password Changed!");
+                    this.password = data;
+                }
+                //TODO: All other cases ->
                 else{
                     return;
                 }
             } catch (IOException | ClassNotFoundException |ArrayIndexOutOfBoundsException e) {
-                reset();
                 return;
             }
         }
         return;
     }
 
-    public synchronized String reset(String username, String protocol){
-        String res = "";
-        sendObject(Protocol.RESETPASSWORD);
-        sendObject(username);
-        try {
-            in = new ObjectInputStream(socket.getInputStream());
-            res = (String) in.readObject();
-            System.out.println("SERVER HA INVIATO: " + res);
-        }catch(Exception e){
-            e.printStackTrace();
-            reset();
-            return res;
-        }
-        return res;
-    }
     //TODO: LOGIN/REGISTRATION METHOD
-    public synchronized String connect(String username, String password, String email, String protocol) {
+    public synchronized String connect(String username, String password, String email, String protocol) throws IOException {
         String res = "";
         if(protocol.equalsIgnoreCase(Protocol.LOGIN)){
             sendObject(Protocol.LOGIN); //INVIO PROTOCOLLO
             this.username = username;
+            this.password = password;
             sendObject(username);
             sendObject(password);
             try {
                 in = new ObjectInputStream(socket.getInputStream());
                 res = (String) in.readObject();  //RICEVO CONFERMA
             } catch (IOException | ClassNotFoundException | NullPointerException e) {
-                reset();
+                socket.close();
+                instance = null;
                 return Protocol.CONNECTION_ERROR;
             }
         }
         else if(protocol.equalsIgnoreCase(Protocol.REGISTRATION)) {
             sendObject(Protocol.REGISTRATION); //INVIO PROTOCOLLO
             this.username = username;
+            this.password = password;
             sendObject(username);
             sendObject(password);
             sendObject(email);
             try {
                 in = new ObjectInputStream(socket.getInputStream());
                 res = (String) in.readObject();  //RICEVO CONFERMA
-                System.out.println("SERVER WROTE: " + res + System.lineSeparator());
             } catch (IOException | ClassNotFoundException | NullPointerException e) {
-                reset();
+                socket.close();
+                instance = null;
                 return Protocol.CONNECTION_ERROR;
             }
         }
-        if(!res.equalsIgnoreCase(Protocol.RECEIVED)){
-            reset();
-        }
         return res;
+    }
+
+    public void resetPassword(String oldPassword, String newPassword){
+        sendMessageTo(Protocol.RESETPASSWORD, username, oldPassword, newPassword);
+    }
+
+    public boolean checkPsw(String psw){
+        return psw.equals(password);
     }
 
     public synchronized boolean sendObject(Object ob){
@@ -280,15 +283,8 @@ public class Client implements Runnable{
         return false;
     }
 
-    public void reset() {
-        try{
-            if(instance != null)
-                instance = null;
-            if(socket != null)
-                socket.close();
-        } catch (IOException e) {
-            return;
-        }
-
+    public void reset() throws IOException {
+        socket.close();
+        instance = null;
     }
 }

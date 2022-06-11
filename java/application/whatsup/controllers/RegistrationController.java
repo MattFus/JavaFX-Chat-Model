@@ -45,16 +45,15 @@ public class RegistrationController implements Initializable {
         if(checkField()){
             String res = Client.getInstance().connect(usernameField.getText(), passwordField.getText(), emailField.getText(), Protocol.REGISTRATION);
             if(res.equalsIgnoreCase(Protocol.RECEIVED)) {
-                resultLabel.setText("Registrazione avvenuta con successo.");
+                resultLabel.setText("Logging..");
                 SceneHandler.getInstance().setChatWindow();
             }
             else{
                 Client.getInstance().reset();
-                System.out.println("niente registrazione");
+                resetFields();
                 resultLabel.setText(res);
             }
         }
-        resetFields();
     }
 
 
@@ -71,10 +70,11 @@ public class RegistrationController implements Initializable {
             return false;
         }
         else if(!containsUpperCase(passwordField.getText())){
-            resultLabel.setText("Password must contains an uppercase letter");
+            resultLabel.setText("Password must contain an uppercase letter");
             return false;
         }
         else if(!containsSpecialChar(passwordField.getText())){
+            resultLabel.setText("Password must contain a symbol");
             return false;
         }
         return true;

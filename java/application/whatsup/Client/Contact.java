@@ -1,6 +1,8 @@
 package application.whatsup.Client;
 
 import javafx.util.Pair;
+
+import java.io.File;
 import java.util.Vector;
 
 public class Contact {
@@ -9,7 +11,7 @@ public class Contact {
     private Vector<Pair<String, byte[]>> userAudioMessages;
     private Vector<Pair<String, String>> userMessages;
     private Vector<Pair<String, String>> userEmojis;
-    private Vector<Pair<String, byte[]>> userFileMessages;
+    private Vector<Pair<String, File>> userFileMessages;
     private Vector<Pair<String, byte[]>> userImageMessages;
 
     public Contact(String username){
@@ -33,8 +35,8 @@ public class Contact {
         userEmojis.add(new Pair<String, String>(fromUser, ikon));
     }
 
-    public synchronized void addFileMessage(String fromUser, byte[] fileData){
-        userFileMessages.add(new Pair<String, byte[]>(fromUser, fileData));
+    public synchronized void addFileMessage(String fromUser, File file){
+        userFileMessages.add(new Pair<String, File>(fromUser, file));
     }
 
     public synchronized void addImageMessage(String fromUser, byte[] imageData){
@@ -75,10 +77,10 @@ public class Contact {
         return tmp;
     }
 
-    public synchronized Vector<Pair<String, byte[]>> getUserFileMessages(){
-        Vector<Pair<String, byte[]>> tmp = new Vector<>();
+    public synchronized Vector<Pair<String, File>> getUserFileMessages(){
+        Vector<Pair<String, File>> tmp = new Vector<>();
         if(!userFileMessages.isEmpty())
-            for(Pair<String, byte[]> p : userFileMessages){
+            for(Pair<String, File> p : userFileMessages){
                 tmp.add(p);
             }
         userFileMessages.clear();

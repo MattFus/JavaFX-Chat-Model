@@ -21,9 +21,6 @@ public class LoginController implements Initializable {
     private PasswordField passwordField;
 
     @FXML
-    private Hyperlink resetHyperLink;
-
-    @FXML
     private Label resultLabel;
 
     @FXML
@@ -34,33 +31,23 @@ public class LoginController implements Initializable {
 
     @FXML
     void onClickLogin(ActionEvent event) throws IOException {
-        String res = Client.getInstance().connect(usernameField.getText(), passwordField.getText(), null, Protocol.LOGIN);
-        if(res.equalsIgnoreCase(Protocol.RECEIVED)) {
-            System.out.println("LOGIN CONFERMATO");
-            SceneHandler.getInstance().setChatWindow();
+        if(!usernameField.getText().isEmpty() || !passwordField.getText().isEmpty()) {
+            String res = Client.getInstance().connect(usernameField.getText(), passwordField.getText(), null, Protocol.LOGIN);
+            if (res.equalsIgnoreCase(Protocol.RECEIVED)) {
+                SceneHandler.getInstance().setChatWindow();
+            } else {
+                Client.getInstance().reset();
+                resultLabel.setWrapText(true);
+                resultLabel.setText(res);
+            }
+            usernameField.setText("");
+            passwordField.setText("");
         }
-        else{
-            System.out.println("NIENTE LOGIN");
-            Client.getInstance().reset();
-            resultLabel.setWrapText(true);
-            resultLabel.setText(res);
-        }
-        usernameField.setText("");
-        passwordField.setText("");
     }
 
     @FXML
     void onClickRegister(ActionEvent event) throws IOException {
         SceneHandler.getInstance().setRegistrationWindow();
-    }
-
-    @FXML
-    void onClickResetPassword(ActionEvent event) {
-        if (!usernameField.getText().isEmpty()){
-            String res = Client.getInstance().reset(usernameField.getText(), Protocol.RESETPASSWORD);
-            resultLabel.setText(res);
-        }
-        else resultLabel.setText("Please insert your username");
     }
 
     @Override

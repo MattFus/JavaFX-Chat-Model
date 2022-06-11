@@ -9,6 +9,7 @@ import java.util.Properties;
 
 public class EmailSender{
     private EmailSender instance = null;
+    //private String password = "whatsupHelper@123123"
     private EmailSender(){
     }
 
@@ -20,8 +21,8 @@ public class EmailSender{
 
     public static void send(String to, String sub, String msg){
         //Get properties object
-        String from = "smtpEmail";
-        String password = "smtpPassword";
+        String from = "whatsuphelper@gmail.com";
+        String password = "whatshupHelper@123123";
         Properties set = new Properties();
         //Set values to the property
         set.put("mail.smtp.starttls.enable", "true");
@@ -37,6 +38,6 @@ public class EmailSender{
         });
         System.out.println("ACCESSO OK");
         //compose message
-        //Have to send Email
+
     }
 }
