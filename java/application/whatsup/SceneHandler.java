@@ -5,6 +5,7 @@ import application.whatsup.controllers.ChatController;
 import application.whatsup.controllers.EmojiController;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -19,9 +20,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.io.*;
 
 public class SceneHandler {
 
@@ -39,6 +39,8 @@ public class SceneHandler {
 
     public void init(Stage primaryStage) throws IOException {
         this.stage = primaryStage;
+        Image icon = new Image(getClass().getResource("/application/whatsup/Images/icon.png").toString());
+        this.stage.getIcons().add(icon);
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("login.fxml"));
         scene = new Scene(fxmlLoader.load());
         scene.getStylesheets().add(this.getClass().getResource("signUpStyle.css").toExternalForm());
@@ -131,6 +133,23 @@ public class SceneHandler {
         dialog.setTitle("Image");
         Image img = new Image(new ByteArrayInputStream(imgbytes), 700, 600, true, true);
         ImageView image = new ImageView(img);
+        image.setCursor(Cursor.HAND);
+        image.setOnMouseClicked(event -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Save image");
+            chooser.setInitialFileName("image.png");
+            chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+            chooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("PNG Files", "*.png"));
+            File file = chooser.showSaveDialog(stage);
+            try {
+                FileOutputStream out = new FileOutputStream(file.getAbsolutePath());
+                out.write(imgbytes);
+            } catch (IOException e) {
+                return;
+            }
+
+        });
         dialog.getDialogPane().getChildren().add(image);
         dialog.getDialogPane().setMinHeight(img.getHeight());
         dialog.getDialogPane().setMinWidth(img.getWidth());
@@ -138,7 +157,7 @@ public class SceneHandler {
         dialog.setY(stage.getY());
         Window window = dialog.getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
-        dialog.showAndWait();
+        dialog.show();
     }
 
     public File showImagePicker() {

@@ -222,7 +222,11 @@ public class Client implements Runnable{
                 in = new ObjectInputStream(socket.getInputStream());
                 res = (String) in.readObject();  //RICEVO CONFERMA
             } catch (IOException | ClassNotFoundException | NullPointerException e) {
-                socket.close();
+                try{
+                    socket.close();
+                }catch(Exception ex){
+                    return Protocol.CONNECTION_ERROR;
+                }
                 instance = null;
                 return Protocol.CONNECTION_ERROR;
             }
@@ -238,7 +242,11 @@ public class Client implements Runnable{
                 in = new ObjectInputStream(socket.getInputStream());
                 res = (String) in.readObject();  //RICEVO CONFERMA
             } catch (IOException | ClassNotFoundException | NullPointerException e) {
-                socket.close();
+                try{
+                    socket.close();
+                }catch(Exception ex){
+                    return Protocol.CONNECTION_ERROR;
+                }
                 instance = null;
                 return Protocol.CONNECTION_ERROR;
             }
@@ -284,7 +292,11 @@ public class Client implements Runnable{
     }
 
     public void reset() throws IOException {
-        socket.close();
+        try {
+            socket.close();
+        }catch(Exception e) {
+            return;
+        }
         instance = null;
     }
 }
